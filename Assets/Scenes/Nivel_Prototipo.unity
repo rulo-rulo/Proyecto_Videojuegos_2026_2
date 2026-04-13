@@ -779,7 +779,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeSlider: {fileID: 155201594}
-  visionCone: {fileID: 0}
+  visionCone: {fileID: 1963272715}
   detectorCamara: {fileID: 0}
 --- !u!114 &155201594
 MonoBehaviour:
@@ -9384,7 +9384,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1931099509}
   m_LocalRotation: {x: -0.31405625, y: 0.63353664, z: 0.31405625, w: 0.63353664}
-  m_LocalPosition: {x: 0, y: 0, z: -5.08}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.0070491014, y: 0.0070491014, z: 0.030588096}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -9393,7 +9393,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: -52.737, y: 90, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.71, y: 3}
+  m_AnchoredPosition: {x: 0, y: 3}
   m_SizeDelta: {x: 407.59998, y: 453}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1931099511
@@ -9589,6 +9589,7 @@ GameObject:
   - component: {fileID: 1963272713}
   - component: {fileID: 1963272712}
   - component: {fileID: 1963272714}
+  - component: {fileID: 1963272715}
   m_Layer: 0
   m_Name: VisionCone
   m_TagString: Untagged
@@ -9683,6 +9684,32 @@ MonoBehaviour:
   colorNormal: {r: 0, g: 1, b: 0, a: 0.3}
   colorAlerta: {r: 1, g: 0, b: 0, a: 0.5}
   viendoAlJugador: 0
+--- !u!114 &1963272715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1963272709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88aef8827f2a4c4439d3798bc6cda4c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  visionConeMaterial: {fileID: 0}
+  visionRange: 10
+  visionAngle: 90
+  visionObstructingLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  resolution: 100
+  normalColor: {r: 0, g: 1, b: 0, a: 1}
+  alertColor: {r: 1, g: 0, b: 0, a: 1}
+  playerDetected: 0
+  derrotaPanel: {fileID: 0}
+  movimientoJugador: {fileID: 0}
+  sonidoDerrota: {fileID: 0}
+  tiempoDeteccion: 1
 --- !u!1 &2005204581
 GameObject:
   m_ObjectHideFlags: 0
