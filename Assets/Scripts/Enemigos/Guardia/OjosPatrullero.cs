@@ -44,15 +44,15 @@ public class OjosPatrullero : MonoBehaviour
         for (int i = 0; i < resolucion; i++)
         {
             float rad = currentAngle * Mathf.Deg2Rad;
-            Vector3 dir = new Vector3(Mathf.Sin(rad), 0, Mathf.Cos(rad));
-            dir = transform.rotation * dir;
+            Vector3 dir = transform.rotation * new Vector3(Mathf.Sin(rad), 0, Mathf.Cos(rad));
 
             Ray ray = new Ray(transform.position, dir);
             RaycastHit hit;
             float distance = rangoVision;
 
-            // ARREGLO: He quitado capaObstaculos para que detecte al Player siempre
-            if (Physics.Raycast(ray, out hit, rangoVision))
+            int mask = ~LayerMask.GetMask("Llave");
+
+            if (Physics.Raycast(ray, out hit, rangoVision, mask))
             {
                 distance = hit.distance;
                 if (hit.collider.CompareTag("Player"))
@@ -61,7 +61,6 @@ public class OjosPatrullero : MonoBehaviour
                 }
             }
 
-            Vector3 point = dir * distance;
             vertices[i + 1] = transform.InverseTransformPoint(transform.position + dir * distance);
             currentAngle += angleStep;
         }
