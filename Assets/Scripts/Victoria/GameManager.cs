@@ -5,30 +5,22 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    [Header("Tiempo")]
-    public float tiempoTranscurrido = 0f;
-    public bool nivelTerminado = false;
-
     [Header("Llaves")]
     public int llavesRecogidas = 0;
-    public int llavesTotales = 7;
-
-    [Header("Puntuacion")]
-    public int puntuacionFinal = 0;
+    public int llavesTotales = 5;
 
     [Header("UI Victoria")]
-    public TMP_Text textoTiempo;
-    public TMP_Text textoPuntuacion;
-    public TMP_Text textoLlaves;
-
-    [Header("Estrellas")]
-    public GameObject estrella1;
-    public GameObject estrella2;
-    public GameObject estrella3;
+    public GameObject panelVictoria;
+    public TMP_Text textoLlavesVictoria;
 
     [Header("UI Derrota")]
-    [Tooltip("Arrastra aquí el Canvas o Panel que contiene tu script DerrotaMenu")]
-    public GameObject panelDerrota; // <--- NUEVA VARIABLE
+    public GameObject panelDerrota;
+    public TMP_Text textoLlavesDerrota;
+
+    [Header("Pause")]
+    public GameObject pauseButton;
+
+    private bool nivelTerminado = false;
 
     private void Awake()
     {
@@ -44,90 +36,68 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        // Nos aseguramos de que las estrellas y la pantalla de derrota estén ocultas al empezar
-        if (estrella1 != null) estrella1.SetActive(false);
-        if (estrella2 != null) estrella2.SetActive(false);
-        if (estrella3 != null) estrella3.SetActive(false);
-        if (panelDerrota != null) panelDerrota.SetActive(false); // <--- NUEVO
-    }
+        if (panelDerrota != null)
+            panelDerrota.SetActive(false);
 
-    private void Update()
-    {
-        if (!nivelTerminado)
-        {
-            tiempoTranscurrido += Time.deltaTime;
-        }
+        if (panelVictoria != null)
+            panelVictoria.SetActive(false);
+
+        ActualizarTextoLlaves();
     }
 
     public void RecogerLlave()
     {
         llavesRecogidas++;
+
+        if (llavesRecogidas > llavesTotales)
+            llavesRecogidas = llavesTotales;
+
+        ActualizarTextoLlaves();
     }
 
     public void FinalizarNivel()
     {
+        if (nivelTerminado) return;
         nivelTerminado = true;
 
-        int minutos = Mathf.FloorToInt(tiempoTranscurrido / 60f);
-        int segundos = Mathf.FloorToInt(tiempoTranscurrido % 60f);
+        if (pauseButton != null)
+            pauseButton.SetActive(false);
 
-        if (textoTiempo != null)
-            textoTiempo.text = "Tiempo: " + minutos.ToString("00") + ":" + segundos.ToString("00");
+        if (panelVictoria != null)
+            panelVictoria.SetActive(true);
 
-        puntuacionFinal = CalcularPuntuacion();
+        ActualizarTextoLlaves();
 
-        if (textoPuntuacion != null)
-            textoPuntuacion.text = "Puntuación: " + puntuacionFinal;
-
-        if (textoLlaves != null)
-            textoLlaves.text = "Llaves recogidas: " + llavesRecogidas + "/" + llavesTotales;
-
-        int estrellas = CalcularEstrellas();
-        MostrarEstrellas(estrellas);
-    }
-
-    // =========================================================
-    // NUEVA FUNCIÓN: Esto es lo que busca el VisionCone del enemigo
-    // =========================================================
-    public void FinalizarDerrota()
-    {
-        nivelTerminado = true; // Pausamos el contador de tiempo
-
-        // Encendemos la pantalla de derrota
-        if (panelDerrota != null)
-        {
-            panelDerrota.SetActive(true);
-        }
-
-        // Pausamos el juego para que el enemigo no siga atacando
-        Time.timeScale = 0f;
-
-        // Desbloqueamos el ratón para que puedas hacer clic en "Reiniciar" o "Menú Principal"
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
-    private int CalcularPuntuacion()
+    public void FinalizarDerrota()
     {
-        int puntosPorLlaves = llavesRecogidas * 100;
-        int bonusTiempo = Mathf.Max(0, 3000 - Mathf.FloorToInt(tiempoTranscurrido * 20f));
-        return puntosPorLlaves + bonusTiempo;
+        if (nivelTerminado) return;
+        nivelTerminado = true;
+
+        if (pauseButton != null)
+            pauseButton.SetActive(false);
+
+        if (panelDerrota != null)
+            panelDerrota.SetActive(true);
+
+        ActualizarTextoLlaves();
+
+        Time.timeScale = 0f;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
-    private int CalcularEstrellas()
+    private void ActualizarTextoLlaves()
     {
-        if (tiempoTranscurrido <= 60f)
-            return 3;
-        else if (tiempoTranscurrido <= 90f)
-            return 2;
-        else
-            return 1;
-    }
+        string texto = "Llaves: " + llavesRecogidas + "/" + llavesTotales;
 
-    private void MostrarEstrellas(int cantidad)
-    {
-        if (estrella1 != null) estrella1.SetActive(cantidad >= 1);
-        if (estrella2 != null) estrella2.SetActive(cantidad >= 2);
-        if (estrella3 != null) estrella3.SetActive(cantidad >= 3);
+        if (textoLlavesVictoria != null)
+            textoLlavesVictoria.text = texto;
+
+        if (textoLlavesDerrota != null)
+            textoLlavesDerrota.text = texto;
     }
 }
