@@ -5,8 +5,8 @@ using TMPro;
 public class HabilidadCooldown : MonoBehaviour
 {
     [Header("Referencias")]
-    public Dash scriptDash;      // Arrastra al Jugador aquí
-    public Image imagenSombra;      // La imagen con Fill Method: Radial 360
+    public Dash scriptDash; // Solo se llena para el DASH
+    public Image imagenSombra;
     public TextMeshProUGUI textoContador;
 
     [Header("Ajustes")]
@@ -16,25 +16,29 @@ public class HabilidadCooldown : MonoBehaviour
     private float timer = 0f;
     private bool estaEnEnfriamiento = false;
 
+    public bool EstaEnEnfriamiento => estaEnEnfriamiento;
+
+    void Start()
+    {
+        if (imagenSombra != null) imagenSombra.fillAmount = 0;
+    }
+
     void Update()
     {
-        // El Cooldown funciona aunque el juego esté pausado si no usas Time.timeScale
         if (estaEnEnfriamiento)
         {
             ActualizarCooldown();
         }
-        else if (Input.GetKeyDown(teclaHabilidad))
+        // Si hay un script de Dash asignado, este script maneja la tecla
+        else if (scriptDash != null && Input.GetKeyDown(teclaHabilidad))
         {
-            UsarHabilidad();
+            scriptDash.ExecuteDash();
+            IniciarCooldown();
         }
     }
 
-    void UsarHabilidad()
+    public void IniciarCooldown()
     {
-        // 1. Ejecutar Dash
-        if (scriptDash != null) scriptDash.ExecuteDash();
-
-        // 2. Bloquear y empezar timer inmediatamente
         estaEnEnfriamiento = true;
         timer = tiempoEnfriamiento;
     }
@@ -42,10 +46,8 @@ public class HabilidadCooldown : MonoBehaviour
     void ActualizarCooldown()
     {
         timer -= Time.deltaTime;
-
         if (timer <= 0f)
         {
-            // Reset al llegar a 0 exacto
             timer = 0f;
             estaEnEnfriamiento = false;
             if (imagenSombra != null) imagenSombra.fillAmount = 0;
@@ -53,7 +55,6 @@ public class HabilidadCooldown : MonoBehaviour
         }
         else
         {
-            // Actualizar visuales (proporción 1 a 0)
             if (imagenSombra != null) imagenSombra.fillAmount = timer / tiempoEnfriamiento;
             if (textoContador != null) textoContador.text = Mathf.Ceil(timer).ToString();
         }
