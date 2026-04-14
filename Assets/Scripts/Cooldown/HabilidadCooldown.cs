@@ -32,8 +32,10 @@ public class HabilidadCooldown : MonoBehaviour
         // Si hay un script de Dash asignado, este script maneja la tecla
         else if (scriptDash != null && Input.GetKeyDown(teclaHabilidad))
         {
-            scriptDash.ExecuteDash();
-            IniciarCooldown();
+            if (scriptDash.ExecuteDash())
+            {
+                IniciarCooldown();
+            }
         }
     }
 

@@ -24,8 +24,12 @@ public class Dash : MonoBehaviour
     }
 
     // Método PÚBLICO para que lo llame el script de Cooldown
-    public void ExecuteDash()
+    public bool ExecuteDash()
     {
+        if (!AbilityManager.Instance.CanUseAbility(this)) return false;
+
+        AbilityManager.Instance.RegisterAbility(this);
+
         if (controller != null) controller.enabled = false;
 
         rb.isKinematic = false;
@@ -35,6 +39,8 @@ public class Dash : MonoBehaviour
         rb.AddForce(direction * dashForce, ForceMode.Impulse);
 
         Invoke(nameof(ResetDash), dashDuration);
+
+        return true;
     }
 
     private void ResetDash()
@@ -44,6 +50,8 @@ public class Dash : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePosition;
 
         if (controller != null) controller.enabled = true;
+
+        AbilityManager.Instance.ClearAbility(this);
     }
 
     private Vector3 GetDirection()

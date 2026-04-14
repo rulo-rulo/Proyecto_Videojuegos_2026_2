@@ -133,6 +133,8 @@ namespace Possession
         {
             if (currentState != PossessionState.Scanning) return;
 
+            AbilityManager.Instance.ClearAbility(this);
+
             outlineController.HideOutlines();
             currentTarget = null;
             currentState = PossessionState.Free;
