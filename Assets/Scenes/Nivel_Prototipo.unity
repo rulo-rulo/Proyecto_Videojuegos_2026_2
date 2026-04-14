@@ -578,8 +578,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1431096773}
+  m_Children: []
   m_Father: {fileID: 2005204582}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1013,7 +1012,7 @@ GameObject:
   - component: {fileID: 222214004}
   - component: {fileID: 222214003}
   m_Layer: 5
-  m_Name: Tecla
+  m_Name: TeclaPosesion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1031,11 +1030,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 322296177}
+  m_Father: {fileID: 2005204582}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -57.5, y: 29}
+  m_AnchoredPosition: {x: -296.8, y: -149.6}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &222214003
@@ -1987,8 +1986,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 222214002}
+  m_Children: []
   m_Father: {fileID: 2005204582}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -6035,8 +6033,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1874637955}
+  m_Children: []
   m_Father: {fileID: 2005204582}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -7811,7 +7808,7 @@ GameObject:
   - component: {fileID: 1431096775}
   - component: {fileID: 1431096774}
   m_Layer: 5
-  m_Name: Tecla
+  m_Name: TeclaDash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7824,16 +7821,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1431096772}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 67860690}
+  m_Father: {fileID: 2005204582}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -57.5, y: 29}
+  m_AnchoredPosition: {x: -402.4, y: -149.6}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1431096774
@@ -8224,9 +8221,9 @@ MonoBehaviour:
   imagenEstrella3: {fileID: 1910005941}
   colorEncendida: {r: 1, g: 1, b: 1, a: 1}
   colorApagada: {r: 0.3, g: 0.3, b: 0.3, a: 0.5}
-  puntosPara1Estrella: 1000
-  puntosPara2Estrellas: 1500
-  puntosPara3Estrellas: 2000
+  puntosPara1Estrella: 0
+  puntosPara2Estrellas: 500
+  puntosPara3Estrellas: 1000
 --- !u!82 &1549571677 stripped
 AudioSource:
   m_CorrespondingSourceObject: {fileID: 3248187289504191766, guid: 85ca4c7115443e14a949ef5f17196e98, type: 3}
@@ -10387,7 +10384,7 @@ GameObject:
   - component: {fileID: 1874637957}
   - component: {fileID: 1874637956}
   m_Layer: 5
-  m_Name: Tecla
+  m_Name: TeclaTelequinesis
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10405,11 +10402,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1073159615}
+  m_Father: {fileID: 2005204582}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -57, y: 29}
+  m_AnchoredPosition: {x: -190.6, y: -149.6}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1874637956
@@ -11300,6 +11297,9 @@ RectTransform:
   - {fileID: 1230460699}
   - {fileID: 1073159615}
   - {fileID: 673586696}
+  - {fileID: 1431096773}
+  - {fileID: 222214002}
+  - {fileID: 1874637955}
   - {fileID: 551940373}
   - {fileID: 1549571667}
   - {fileID: 1880605816}
