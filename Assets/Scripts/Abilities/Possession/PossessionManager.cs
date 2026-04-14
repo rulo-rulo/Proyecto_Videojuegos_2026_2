@@ -25,6 +25,7 @@ namespace Possession
         private float scanRefreshTimer;
         private float possessionTimer;
         private bool isTimerRunning = false;
+        private Collider[] playerColliders;
 
         public PossessionState CurrentState => currentState;
         public float PossessionTimer => possessionTimer;
@@ -38,6 +39,7 @@ namespace Possession
             inputHandler = GetComponent<InputHandler>();
             inputHandler.OnPossessionKeyPressed += HandlePossessionInput;
             inputHandler.OnCancelKeyPressed += CancelScanning;
+            playerColliders = playerTransform.GetComponentsInChildren<Collider>();
         }
 
         private void OnDestroy()
@@ -164,6 +166,12 @@ namespace Possession
             playerMovimiento.enabled = false;
             playerController.enabled = false;
             playerModel.SetActive(false);
+
+            foreach (Collider col in playerColliders)
+            {
+                col.enabled = false;
+            }
+
             camara.SetTarget(currentTarget.Transform);
 
             float speed = config.GetSpeedForWeight(currentTarget.WeightClass);
@@ -192,6 +200,15 @@ namespace Possession
             playerController.enabled = false;
             playerTransform.position = spawnPosition;
             playerController.enabled = true;
+
+            playerModel.SetActive(true);
+            playerMovimiento.enabled = true;
+            camara.SetTarget(playerTransform);
+
+            foreach (Collider col in playerColliders)
+            {
+                col.enabled = true;
+            }
 
             playerModel.SetActive(true);
             playerMovimiento.enabled = true;
