@@ -36,6 +36,18 @@ public class PauseManager : MonoBehaviour
         Time.timeScale = 1f;
     }
 
+    public void HidePauseButton()
+    {
+        if (pauseButton != null)
+            pauseButton.SetActive(false);
+    }
+
+    public void ShowPauseButton()
+    {
+        if (pauseButton != null)
+            pauseButton.SetActive(true);
+    }
+
     public void RestartLevel()
     {
         Time.timeScale = 1f;

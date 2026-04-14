@@ -1,11 +1,13 @@
 using System.Collections;
 using UnityEngine;
+using TMPro;
 
 public class Meta : MonoBehaviour
 {
     [Header("Textos e Interfaz")]
     [Tooltip("El texto del Canvas que dice 'Pulsa E'")]
     public GameObject mensajeUI;
+  
 
     [Tooltip("El texto 3D flotante sobre la puerta")]
     public GameObject textoSobrePuerta;
@@ -37,6 +39,7 @@ public class Meta : MonoBehaviour
     private bool jugadorCerca = false;
     private bool metaAlcanzada = false; // Evita que se active varias veces
 
+
     private void Awake()
     {
         // Preparamos el audio de victoria para que no suene de golpe al arrancar
@@ -61,19 +64,44 @@ public class Meta : MonoBehaviour
         // Si el jugador está cerca, pulsa E, y AÚN NO ha llegado a la meta
         if (jugadorCerca && !metaAlcanzada && Input.GetKeyDown(KeyCode.E))
         {
-            StartCoroutine(RutinaMeta());
+            if (KeyCounterUI.Instance != null && KeyCounterUI.Instance.HasAllKeys())
+            {
+                StartCoroutine(RutinaMeta());
+            }
+            else
+            {
+                if (mensajeUI != null)
+                {
+                    mensajeUI.GetComponent<TextMeshPro>().text = "Recoge todas las llaves";
+                }
+            }
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+       private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !metaAlcanzada)
         {
             jugadorCerca = true;
-            if (mensajeUI != null) mensajeUI.SetActive(true);
+
+            if (mensajeUI != null)
+            {
+                mensajeUI.SetActive(true);
+
+                if (KeyCounterUI.Instance != null && KeyCounterUI.Instance.HasAllKeys())
+                {
+                    mensajeUI.GetComponent<TextMeshPro>().text = "Pulsa [E] para salir";
+                }
+                else
+                {
+                    mensajeUI.GetComponent<TextMeshPro>().text = "Recoge todas las llaves";
+                }
+            }
+
             if (textoSobrePuerta != null) textoSobrePuerta.SetActive(true);
         }
     }
+
 
     private void OnTriggerExit(Collider other)
     {
