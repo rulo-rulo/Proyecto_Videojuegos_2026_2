@@ -8078,7 +8078,7 @@ MonoBehaviour:
   tiempoDeEspera: 0.5
   velocidadGiro: 2
   velocidadPersecucion: 2
-  tiempoDeteccion: 3
+  tiempoDeteccion: 5
   derrotaPanel: {fileID: 725598569}
   movimientoJugador: {fileID: 1639417671}
 --- !u!1 &1693085876
@@ -9679,10 +9679,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   materialCono: {fileID: 2100000, guid: 631c4a2297d3a8f4eaad4d07d8959a5b, type: 2}
   rangoVision: 10
-  anguloVision: 40
-  resolucion: 200
-  colorNormal: {r: 0, g: 1, b: 0, a: 0.3}
-  colorAlerta: {r: 1, g: 0, b: 0, a: 0.5}
+  anguloVision: 90
+  resolucion: 100
+  colorNormal: {r: 0, g: 1, b: 0, a: 0.39215687}
+  colorAlerta: {r: 1, g: 0, b: 0, a: 0.39215687}
   viendoAlJugador: 0
 --- !u!114 &1963272715
 MonoBehaviour:
@@ -9696,20 +9696,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88aef8827f2a4c4439d3798bc6cda4c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  visionConeMaterial: {fileID: 0}
+  visionConeMaterial: {fileID: 2100000, guid: 631c4a2297d3a8f4eaad4d07d8959a5b, type: 2}
   visionRange: 10
   visionAngle: 90
   visionObstructingLayer:
     serializedVersion: 2
     m_Bits: 0
   resolution: 100
-  normalColor: {r: 0, g: 1, b: 0, a: 1}
-  alertColor: {r: 1, g: 0, b: 0, a: 1}
+  normalColor: {r: 0, g: 1, b: 0, a: 0.39215687}
+  alertColor: {r: 1, g: 0, b: 0, a: 0.39215687}
   playerDetected: 0
   derrotaPanel: {fileID: 0}
   movimientoJugador: {fileID: 0}
   sonidoDerrota: {fileID: 0}
-  tiempoDeteccion: 1
+  tiempoDeteccion: 3
 --- !u!1 &2005204581
 GameObject:
   m_ObjectHideFlags: 0

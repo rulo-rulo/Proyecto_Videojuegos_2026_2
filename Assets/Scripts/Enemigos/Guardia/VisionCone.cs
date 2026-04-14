@@ -99,7 +99,6 @@ public class VisionCone : MonoBehaviour
         int      vertexCount = resolution + 1;
         Vector3[] vertices   = new Vector3[vertexCount];
         int[]     triangles  = new int[(resolution - 1) * 3];
-
         vertices[0] = Vector3.zero;
 
         float angleStep    = visionAngle / (resolution - 1);
@@ -108,13 +107,11 @@ public class VisionCone : MonoBehaviour
         for (int i = 0; i < resolution; i++)
         {
             float rad = currentAngle * Mathf.Deg2Rad;
-
             Vector3 dir = new Vector3(Mathf.Sin(rad), 0, Mathf.Cos(rad));
             dir = transform.rotation * dir;
 
             Ray        ray = new Ray(transform.position, dir);
             RaycastHit hit;
-
             float distance = visionRange;
 
             if (Physics.Raycast(ray, out hit, visionRange))
@@ -126,7 +123,7 @@ public class VisionCone : MonoBehaviour
             }
 
             Vector3 point = dir * distance;
-            vertices[i + 1] = transform.InverseTransformPoint(transform.position + point);
+            vertices[i + 1] = transform.InverseTransformPoint(transform.position + dir * distance);
 
             currentAngle += angleStep;
         }

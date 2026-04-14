@@ -44,7 +44,8 @@ public class OjosPatrullero : MonoBehaviour
         for (int i = 0; i < resolucion; i++)
         {
             float rad = currentAngle * Mathf.Deg2Rad;
-            Vector3 dir = transform.rotation * new Vector3(Mathf.Sin(rad), 0, Mathf.Cos(rad));
+            Vector3 dir = new Vector3(Mathf.Sin(rad), 0, Mathf.Cos(rad));
+            dir = transform.rotation * dir;
 
             Ray ray = new Ray(transform.position, dir);
             RaycastHit hit;
@@ -60,6 +61,7 @@ public class OjosPatrullero : MonoBehaviour
                 }
             }
 
+            Vector3 point = dir * distance;
             vertices[i + 1] = transform.InverseTransformPoint(transform.position + dir * distance);
             currentAngle += angleStep;
         }
