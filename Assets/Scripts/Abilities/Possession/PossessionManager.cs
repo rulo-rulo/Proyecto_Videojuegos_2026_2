@@ -5,45 +5,50 @@ namespace Possession
 {
     public class PossessionManager : MonoBehaviour
     {
-        [SerializeField] private PossessionConfig    config;
-        [SerializeField] private Transform           playerTransform;
-        [SerializeField] private OutlineController   outlineController;
-        [SerializeField] private Camara              camara;
-        [SerializeField] private PlayerMovimiento    playerMovimiento;
+        [Header("Referencias de Configuración")]
+        [SerializeField] private PossessionConfig config;
+        [SerializeField] private Transform playerTransform;
+        [SerializeField] private OutlineController outlineController;
+        [SerializeField] private Camara camara;
+        [SerializeField] private PlayerMovimiento playerMovimiento;
         [SerializeField] private CharacterController playerController;
-        [SerializeField] private GameObject          playerModel;
-        [SerializeField] private float               possessionDuration = 5f;
+        [SerializeField] private GameObject playerModel;
+        [SerializeField] private float possessionDuration = 5f;
 
-        private InputHandler       inputHandler;
-        private PossessionState    currentState       = PossessionState.Free;
-        private IPossessable       currentTarget;
+        [Header("Sistema de Cooldown UI")]
+        [SerializeField] private HabilidadCooldown uiCooldown; // Referencia al icono de la mano en la UI
+
+        private InputHandler inputHandler;
+        private PossessionState currentState = PossessionState.Free;
+        private IPossessable currentTarget;
         private List<IPossessable> nearbyPossessables = new List<IPossessable>();
-        private float              scanRefreshTimer;
-        private float              possessionTimer;
-        private bool               isTimerRunning     = false;
+        private float scanRefreshTimer;
+        private float possessionTimer;
+        private bool isTimerRunning = false;
 
-        public PossessionState CurrentState       => currentState;
-        public float           PossessionTimer    => possessionTimer;
-        public float           PossessionDuration => possessionDuration;
-        public IPossessable    CurrentTarget      => currentTarget;
+        public PossessionState CurrentState => currentState;
+        public float PossessionTimer => possessionTimer;
+        public float PossessionDuration => possessionDuration;
+        public IPossessable CurrentTarget => currentTarget;
 
-        // -------------------------------------------------- Unity
+        // -------------------------------------------------- Unity Lifecycle
 
         private void Awake()
         {
             inputHandler = GetComponent<InputHandler>();
             inputHandler.OnPossessionKeyPressed += HandlePossessionInput;
-            inputHandler.OnCancelKeyPressed     += CancelScanning;
+            inputHandler.OnCancelKeyPressed += CancelScanning;
         }
 
         private void OnDestroy()
         {
             inputHandler.OnPossessionKeyPressed -= HandlePossessionInput;
-            inputHandler.OnCancelKeyPressed     -= CancelScanning;
+            inputHandler.OnCancelKeyPressed -= CancelScanning;
         }
 
         private void Update()
         {
+            // Gestión del tiempo de posesión (cuánto tiempo estamos dentro del objeto)
             if (currentState == PossessionState.Possessing && isTimerRunning)
             {
                 possessionTimer -= Time.deltaTime;
@@ -58,6 +63,7 @@ namespace Possession
 
             if (currentState != PossessionState.Scanning) return;
 
+            // Lógica de escaneo de objetos cercanos
             scanRefreshTimer += Time.deltaTime;
             if (scanRefreshTimer >= 0.1f)
             {
@@ -86,18 +92,23 @@ namespace Possession
             if (nearbyPossessables.Count == 0) return;
 
             IPossessable newNearest = FindNearestFrom(nearbyPossessables);
-
             if (newNearest == null || newNearest == currentTarget) return;
 
             currentTarget = newNearest;
             outlineController.ShowOutlines(nearbyPossessables, currentTarget);
-
-            Debug.Log($"[Possession] Nuevo objetivo más cercano: {((MonoBehaviour)currentTarget).gameObject.name}");
         }
-        // -------------------------------------------------- Input
+
+        // -------------------------------------------------- Lógica de Input
 
         private void HandlePossessionInput()
         {
+            // REQUISITO T012: Bloqueo si la habilidad está en enfriamiento
+            if (uiCooldown != null && uiCooldown.EstaEnEnfriamiento)
+            {
+                Debug.Log("[Possession] La habilidad aún no está lista.");
+                return;
+            }
+
             if (!AbilityManager.Instance.CanUseAbility(this)) return;
 
             switch (currentState)
@@ -116,7 +127,7 @@ namespace Possession
             }
         }
 
-        // -------------------------------------------------- Estados
+        // -------------------------------------------------- Gestión de Estados
 
         private void CancelScanning()
         {
@@ -124,8 +135,7 @@ namespace Possession
 
             outlineController.HideOutlines();
             currentTarget = null;
-            currentState  = PossessionState.Free;
-
+            currentState = PossessionState.Free;
             Debug.Log("[Possession] Escaneo cancelado.");
         }
 
@@ -134,39 +144,39 @@ namespace Possession
             AbilityManager.Instance.RegisterAbility(this);
 
             nearbyPossessables = FindAllNearby();
-            currentTarget      = FindNearestFrom(nearbyPossessables);
-            currentState       = PossessionState.Scanning;
+            currentTarget = FindNearestFrom(nearbyPossessables);
+            currentState = PossessionState.Scanning;
 
             if (nearbyPossessables.Count > 0)
                 outlineController.ShowOutlines(nearbyPossessables, currentTarget);
 
-            Debug.Log($"[Possession] Escaneando.");
+            Debug.Log("[Possession] Escaneo iniciado.");
         }
 
         private void TryPossess()
         {
             if (currentTarget == null) return;
-        
+
             currentState = PossessionState.Possessing;
             outlineController.HideOutlines();
-            playerMovimiento.enabled  = false;
-            playerController.enabled  = false;
+            playerMovimiento.enabled = false;
+            playerController.enabled = false;
             playerModel.SetActive(false);
             camara.SetTarget(currentTarget.Transform);
-        
+
             float speed = config.GetSpeedForWeight(currentTarget.WeightClass);
             currentTarget.OnPossess(speed);
-        
+
             possessionTimer = possessionDuration;
-            isTimerRunning  = true;
-        
-            Debug.Log($"[Possession] Poseyendo con velocidad: {speed}");
+            isTimerRunning = true;
+
+            Debug.Log($"[Possession] Poseyendo objeto...");
         }
 
         private void Depossess()
         {
             AbilityManager.Instance.ClearAbility(this);
-            
+
             if (currentTarget == null) return;
 
             currentTarget.OnDepossess();
@@ -176,22 +186,27 @@ namespace Possession
                 config.spawnSearchRadius
             );
 
-            CharacterController cc = playerController;
-            cc.enabled = false;
+            // Desactivamos CC temporalmente para mover el transform físicamente
+            playerController.enabled = false;
             playerTransform.position = spawnPosition;
-            cc.enabled = true;
+            playerController.enabled = true;
 
             playerModel.SetActive(true);
             playerMovimiento.enabled = true;
             camara.SetTarget(playerTransform);
 
             currentTarget = null;
-            currentState  = PossessionState.Free;
+            currentState = PossessionState.Free;
 
-            Debug.Log("[Possession] Jugador liberado.");
+            if (uiCooldown != null)
+            {
+                uiCooldown.IniciarCooldown();
+            }
+
+            Debug.Log("[Possession] Jugador expulsado del objeto.");
         }
 
-        // -------------------------------------------------- Detección
+        // -------------------------------------------------- Métodos de Detección
 
         private List<IPossessable> FindAllNearby()
         {
@@ -204,7 +219,8 @@ namespace Possession
 
             foreach (Collider hit in hits)
             {
-                if (hit.TryGetComponent(out PossessableObject candidate))
+                // Buscamos el componente que implementa la interfaz possessable
+                if (hit.TryGetComponent(out IPossessable candidate))
                     result.Add(candidate);
             }
 
@@ -213,8 +229,8 @@ namespace Possession
 
         private IPossessable FindNearestFrom(List<IPossessable> possessables)
         {
-            IPossessable nearest  = null;
-            float        bestDist = float.MaxValue;
+            IPossessable nearest = null;
+            float bestDist = float.MaxValue;
 
             foreach (IPossessable p in possessables)
             {
@@ -222,7 +238,7 @@ namespace Possession
                 if (dist < bestDist)
                 {
                     bestDist = dist;
-                    nearest  = p;
+                    nearest = p;
                 }
             }
 
