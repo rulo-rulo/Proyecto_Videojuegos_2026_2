@@ -11,6 +11,9 @@ namespace Telekinesis
         [SerializeField] private TelekinesisOutlineController outlineController;
         [SerializeField] private PlayerMovimiento playerMovimiento;
 
+        [Header("Sistema de Cooldown UI")]
+        [SerializeField] private HabilidadCooldown uiCooldown;
+
         private TelekinesisInputHandler    inputHandler;
         private TelekinesisState           currentState = TelekinesisState.Idle;
         private MovableObject              currentTarget;
@@ -74,6 +77,15 @@ namespace Telekinesis
 
         private void HandleActionInput()
         {
+
+            
+            if (uiCooldown != null && uiCooldown.EstaEnEnfriamiento)
+            {
+                Debug.Log("[Telekinesis] La habilidad se está recargando.");
+                return;
+            }
+
+
             if (!AbilityManager.Instance.CanUseAbility(this)) return;
             switch (currentState)
             {
@@ -127,6 +139,11 @@ namespace Telekinesis
 
             Vector3 direction = GetWorldDirection(inputHandler.LastDirection);
             currentTarget.ApplyForce(direction, config.pushForce);
+
+            if (uiCooldown != null)
+            {
+                uiCooldown.IniciarCooldown();
+            }
 
             Cancel();
         }
