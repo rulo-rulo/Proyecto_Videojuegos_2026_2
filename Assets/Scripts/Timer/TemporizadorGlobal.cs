@@ -24,12 +24,6 @@ public class TemporizadorGlobal : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        // El tiempo empieza a contar en cuanto arranca el nivel
-        IniciarTemporizador();
-    }
-
     private void Update()
     {
         if (estaContando)
