@@ -14,6 +14,8 @@ public class GhostFade : MonoBehaviour
 
     public IEnumerator FadeOut()
     {
+        Debug.Log("FadeOut del fantasma iniciado");
+
         float t = 0;
 
         while (t < fadeDuration)
