@@ -1095,6 +1095,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -2238,6 +2239,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -3068,6 +3070,7 @@ MonoBehaviour:
   puntoDestino: {fileID: 861652237}
   velocidadJugador: 2.5
   audioVictoria: {fileID: 1549571677}
+  ghostFade: {fileID: 666245472}
 --- !u!65 &589484907
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3111,6 +3114,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &589484909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 589484904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b34bd580e22a74a46b0afbcaff4fea4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fadeDuration: 1
 --- !u!1 &638099471 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b0fa9d5f47fd5b8459326cb9256d9336, type: 3}
@@ -3211,6 +3227,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fb5b62cde662ca143bca39a18d5ba88e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 589484908}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fb5b62cde662ca143bca39a18d5ba88e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 589484909}
   m_SourcePrefab: {fileID: 100100000, guid: fb5b62cde662ca143bca39a18d5ba88e, type: 3}
 --- !u!1 &649943005
 GameObject:
@@ -3534,6 +3553,19 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 99d60ed951406b542b10877fdf08859e, type: 3}
   m_PrefabInstance: {fileID: 1761081758}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &666245472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 666245470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b34bd580e22a74a46b0afbcaff4fea4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fadeDuration: 1
 --- !u!1 &673586695
 GameObject:
   m_ObjectHideFlags: 0
@@ -4827,6 +4859,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -5534,6 +5567,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -8027,6 +8061,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -8721,6 +8756,7 @@ MonoBehaviour:
   puntoDestino: {fileID: 0}
   velocidadJugador: 2.5
   audioVictoria: {fileID: 0}
+  ghostFade: {fileID: 0}
 --- !u!1 &1639417666 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3780348248182164018, guid: 772bcb8039c8d62489c7b1de889ec7a4, type: 3}
@@ -9696,6 +9732,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -9846,7 +9883,10 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 52361805505633545, guid: 99d60ed951406b542b10877fdf08859e, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 99d60ed951406b542b10877fdf08859e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 666245472}
   m_SourcePrefab: {fileID: 100100000, guid: 99d60ed951406b542b10877fdf08859e, type: 3}
 --- !u!1001 &1762645603
 PrefabInstance:
@@ -10738,6 +10778,7 @@ MonoBehaviour:
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
