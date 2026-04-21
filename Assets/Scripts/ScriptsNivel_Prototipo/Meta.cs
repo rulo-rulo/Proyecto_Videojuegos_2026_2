@@ -176,7 +176,7 @@ public class Meta : MonoBehaviour
         Debug.Log("Cinemática de caminar terminada.");
 
         // Esperamos 1 segundo de cortesía tras haber entrado
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSeconds(0.1f);
 
         // Fade del fantasma antes de mostrar la victoria
         if (ghostFade != null)
