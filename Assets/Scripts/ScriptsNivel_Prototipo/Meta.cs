@@ -7,7 +7,7 @@ public class Meta : MonoBehaviour
     [Header("Textos e Interfaz")]
     [Tooltip("El texto del Canvas que dice 'Pulsa E'")]
     public GameObject mensajeUI;
-  
+
 
     [Tooltip("El texto 3D flotante sobre la puerta")]
     public GameObject textoSobrePuerta;
@@ -82,7 +82,7 @@ public class Meta : MonoBehaviour
         }
     }
 
-       private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player") && !metaAlcanzada)
         {
@@ -105,7 +105,6 @@ public class Meta : MonoBehaviour
             if (textoSobrePuerta != null) textoSobrePuerta.SetActive(true);
         }
     }
-
 
     private void OnTriggerExit(Collider other)
     {
@@ -152,18 +151,10 @@ public class Meta : MonoBehaviour
             if (rb != null) rb.isKinematic = true;
 
             Vector3 destinoPlano = new Vector3(
-            puntoDestino.position.x,
-            jugador.position.y,
-            puntoDestino.position.z
-        );
-            float tiempoMaximo = 4f;
-            float tiempoActual = 0f;
-
-            Vector3 destinoPlano = new Vector3(
-    puntoDestino.position.x,
-    jugador.position.y,
-    puntoDestino.position.z
-);
+                puntoDestino.position.x,
+                jugador.position.y,
+                puntoDestino.position.z
+            );
 
             float tiempoMaximo = 4f;
             float tiempoActual = 0f;
@@ -178,6 +169,7 @@ public class Meta : MonoBehaviour
                     velocidadJugador * Time.deltaTime
                 );
 
+                // Cuando el fantasma está cruzando el umbral, empieza a desaparecer
                 if (!fadeIniciado && Vector3.Distance(jugador.position, destinoPlano) < 0.6f)
                 {
                     fadeIniciado = true;
@@ -191,17 +183,18 @@ public class Meta : MonoBehaviour
                 tiempoActual += Time.deltaTime;
                 yield return null;
             }
+        }
 
-            Debug.Log("Cinemática de caminar terminada.");
+        Debug.Log("Cinemática de caminar terminada.");
 
-            yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSeconds(0.6f);
 
-            // =========================================================
-            // 4. LÓGICA DE VICTORIA (Tras terminar de caminar)
-            // =========================================================
+        // =========================================================
+        // 4. LÓGICA DE VICTORIA (Tras terminar de caminar)
+        // =========================================================
 
-            // Avisamos al GameManager para que calcule puntuaciones, tiempo, etc.
-            if (GameManager.Instance != null)
+        // Avisamos al GameManager para que calcule puntuaciones, tiempo, etc.
+        if (GameManager.Instance != null)
         {
             GameManager.Instance.FinalizarNivel();
         }
