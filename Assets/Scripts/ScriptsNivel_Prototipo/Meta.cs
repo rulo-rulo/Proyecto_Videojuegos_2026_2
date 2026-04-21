@@ -176,7 +176,7 @@ public class Meta : MonoBehaviour
         Debug.Log("Cinemática de caminar terminada.");
 
         // Esperamos 1 segundo de cortesía tras haber entrado
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.8f);
 
         // Fade del fantasma antes de mostrar la victoria
         if (ghostFade != null)
@@ -184,7 +184,7 @@ public class Meta : MonoBehaviour
             yield return StartCoroutine(ghostFade.FadeOut());
         }
 
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.6f);
 
         // =========================================================
         // 4. LÓGICA DE VICTORIA (Tras terminar de caminar)

@@ -3,14 +3,17 @@ using UnityEngine;
 
 public class GhostFade : MonoBehaviour
 {
-    [SerializeField] float fadeDuration = 1f;
+    [SerializeField] private float fadeDuration = 2f;
 
-    Renderer[] rends;
+    private Renderer[] rends;
 
-    void Awake()
+    private void Awake()
     {
         rends = GetComponentsInChildren<Renderer>();
         Debug.Log("Renderers encontrados en fantasma: " + rends.Length);
+
+        // Asegura que el fantasma empieza totalmente visible
+        SetAlpha(1f);
     }
 
     public IEnumerator FadeOut()
@@ -21,50 +24,32 @@ public class GhostFade : MonoBehaviour
 
         while (t < fadeDuration)
         {
-            float alpha = Mathf.Lerp(1f, 0f, t / fadeDuration);
+            float alpha01 = Mathf.Lerp(1f, 0f, t / fadeDuration);
+            SetAlpha(alpha01);
 
-            foreach (Renderer r in rends)
-            {
-                foreach (Material m in r.materials)
-                {
-                    if (m.HasProperty("_BaseColor"))
-                    {
-                        Color c = m.GetColor("_BaseColor");
-                        c.a = alpha;
-                        m.SetColor("_BaseColor", c);
-                    }
-                    else if (m.HasProperty("_Color"))
-                    {
-                        Color c = m.color;
-                        c.a = alpha;
-                        m.color = c;
-                    }
-                }
-            }
+            Debug.Log("Alpha actual: " + alpha01);
 
             t += Time.deltaTime;
             yield return null;
         }
 
+        SetAlpha(0f);
+        gameObject.SetActive(false);
+    }
+
+    private void SetAlpha(float alpha)
+    {
         foreach (Renderer r in rends)
         {
             foreach (Material m in r.materials)
             {
-                if (m.HasProperty("_BaseColor"))
-                {
-                    Color c = m.GetColor("_BaseColor");
-                    c.a = 0f;
-                    m.SetColor("_BaseColor", c);
-                }
-                else if (m.HasProperty("_Color"))
+                if (m.HasProperty("_Color"))
                 {
                     Color c = m.color;
-                    c.a = 0f;
+                    c.a = alpha;
                     m.color = c;
                 }
             }
         }
-
-        gameObject.SetActive(false);
     }
 }
