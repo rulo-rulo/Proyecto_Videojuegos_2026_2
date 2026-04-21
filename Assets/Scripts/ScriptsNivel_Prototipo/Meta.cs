@@ -170,7 +170,7 @@ public class Meta : MonoBehaviour
                 );
 
                 // Cuando el fantasma está cruzando el umbral, empieza a desaparecer
-                if (!fadeIniciado && Vector3.Distance(jugador.position, destinoPlano) < 0.6f)
+                if (!fadeIniciado && Vector3.Distance(jugador.position, destinoPlano) < 1.0f)
                 {
                     fadeIniciado = true;
 
