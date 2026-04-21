@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
@@ -10,11 +9,9 @@ public class DetectorCamara : MonoBehaviour
     public string tagJugador = "Player";
     public LayerMask capaObstaculos;
 
-    [Header("Interfaz y Derrota")]
-    public GameObject derrotaPanel;
-    public MonoBehaviour movimientoJugador;
-    public AudioSource sonidoDerrota;
+    [Header("Interfaz y Alerta")]
     public float tiempoDeteccion = 1.0f;
+    public float velocidadEnfoque = 4f;
 
     [Header("Dimensiones del Cono")]
     public float rangoVision = 10f;
@@ -28,13 +25,13 @@ public class DetectorCamara : MonoBehaviour
 
     private Mesh mesh;
     private Material materialCono;
-    private bool derrotaActivada = false;
     private float timerDeteccion = 0f;
-
-    public bool  PlayerDetected  => jugadorEncontrado;
-    public float DetectionTimer  => timerDeteccion;
-
+    private bool alertaActivada = false;
     private bool jugadorEncontrado = false;
+    private Vector3 ultimoPuntoDeteccion;
+
+    public bool PlayerDetected => jugadorEncontrado;
+    public float DetectionTimer => timerDeteccion;
 
     void Start()
     {
@@ -43,36 +40,37 @@ public class DetectorCamara : MonoBehaviour
         GetComponent<MeshFilter>().mesh = mesh;
 
         MeshRenderer mr = GetComponent<MeshRenderer>();
-        mr.material    = new Material(mr.material);
-        materialCono   = mr.material;
+        mr.material = new Material(mr.material);
+        materialCono = mr.material;
         materialCono.color = colorNormal;
-
-        if (derrotaPanel != null)
-            derrotaPanel.SetActive(false);
     }
 
     void LateUpdate()
     {
-        if (derrotaActivada) return;
-
         jugadorEncontrado = false;
         GenerarConoYDetectar(ref jugadorEncontrado);
 
         if (jugadorEncontrado)
         {
-            materialCono.color  = colorAlerta;
-            timerDeteccion     += Time.deltaTime;
+            materialCono.color = colorAlerta;
+            timerDeteccion += Time.deltaTime;
+            ultimoPuntoDeteccion = jugador.position;
+
+            EnfocarJugador();
 
             if (DetectionHUD.Instance != null)
                 DetectionHUD.Instance.ReportTimer(this, tiempoDeteccion - timerDeteccion);
 
-            if (timerDeteccion >= tiempoDeteccion)
-                ActivarDerrota();
+            if (timerDeteccion >= tiempoDeteccion && !alertaActivada)
+            {
+                ActivarAlerta();
+            }
         }
         else
         {
             materialCono.color = colorNormal;
-            timerDeteccion     = 0f;
+            timerDeteccion = 0f;
+            alertaActivada = false;
 
             if (DetectionHUD.Instance != null)
                 DetectionHUD.Instance.RemoveTimer(this);
@@ -86,15 +84,15 @@ public class DetectorCamara : MonoBehaviour
 
         for (int y = 0; y <= resolucion; y++)
         {
-            float tY   = (float)y / resolucion;
+            float tY = (float)y / resolucion;
             float angY = Mathf.Lerp(-aperturaVertical / 2, aperturaVertical / 2, tY);
 
             for (int x = 0; x <= resolucion; x++)
             {
-                float tX   = (float)x / resolucion;
+                float tX = (float)x / resolucion;
                 float angX = Mathf.Lerp(-aperturaHorizontal / 2, aperturaHorizontal / 2, tX);
 
-                Vector3 dirLocal  = Quaternion.Euler(angY, angX, 0) * Vector3.forward;
+                Vector3 dirLocal = Quaternion.Euler(angY, angX, 0) * Vector3.forward;
                 Vector3 dirGlobal = transform.TransformDirection(dirLocal);
 
                 float distanciaFinal = rangoVision;
@@ -120,36 +118,48 @@ public class DetectorCamara : MonoBehaviour
             for (int x = 0; x < resolucion; x++)
             {
                 int i = y * vFila + x + 1;
-                tri.Add(i);         tri.Add(i + 1);         tri.Add(i + vFila);
-                tri.Add(i + vFila); tri.Add(i + 1);         tri.Add(i + vFila + 1);
+                tri.Add(i); tri.Add(i + 1); tri.Add(i + vFila);
+                tri.Add(i + vFila); tri.Add(i + 1); tri.Add(i + vFila + 1);
 
-                if (y == 0)              { tri.Add(0); tri.Add(i + 1);         tri.Add(i); }
-                if (y == resolucion - 1) { tri.Add(0); tri.Add(i + vFila);     tri.Add(i + vFila + 1); }
-                if (x == 0)              { tri.Add(0); tri.Add(i);             tri.Add(i + vFila); }
+                if (y == 0) { tri.Add(0); tri.Add(i + 1); tri.Add(i); }
+                if (y == resolucion - 1) { tri.Add(0); tri.Add(i + vFila); tri.Add(i + vFila + 1); }
+                if (x == 0) { tri.Add(0); tri.Add(i); tri.Add(i + vFila); }
                 if (x == resolucion - 1) { tri.Add(0); tri.Add(i + vFila + 1); tri.Add(i + 1); }
             }
         }
 
         mesh.Clear();
-        mesh.vertices  = vertices.ToArray();
+        mesh.vertices = vertices.ToArray();
         mesh.triangles = tri.ToArray();
         mesh.RecalculateNormals();
     }
 
-    void ActivarDerrota()
-{
-    derrotaActivada = true;
+    void EnfocarJugador()
+    {
+        if (jugador == null) return;
 
-    if (DetectionHUD.Instance != null)
-        DetectionHUD.Instance.RemoveTimer(this);
+        Vector3 direccion = jugador.position - transform.position;
+        direccion.y = 0f;
 
-    if (GameManager.Instance != null)
-        GameManager.Instance.FinalizarDerrota();
+        if (direccion.sqrMagnitude < 0.001f) return;
 
-    if (movimientoJugador != null)
-        movimientoJugador.enabled = false;
+        Quaternion rotacionObjetivo = Quaternion.LookRotation(direccion);
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            rotacionObjetivo,
+            velocidadEnfoque * Time.deltaTime
+        );
+    }
 
-    if (sonidoDerrota != null)
-        sonidoDerrota.Play();
-}
+    void ActivarAlerta()
+    {
+        alertaActivada = true;
+
+        if (DetectionHUD.Instance != null)
+            DetectionHUD.Instance.RemoveTimer(this);
+
+        AlertaGlobal.Activar(ultimoPuntoDeteccion);
+
+        Debug.Log("La cámara ha activado una alerta global en: " + ultimoPuntoDeteccion);
+    }
 }
