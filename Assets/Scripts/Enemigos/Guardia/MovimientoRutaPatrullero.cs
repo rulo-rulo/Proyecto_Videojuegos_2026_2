@@ -30,6 +30,9 @@ public class MovimientoRutaPatrullero : MonoBehaviour
     private float timerDeteccion = 0f;
     private bool derrotaActivada = false;
 
+    private Vector3 puntoAlerta;
+    private bool enBusqueda = false;
+
     void Start()
     {
         destinoActual = puntoB;
@@ -45,6 +48,7 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         if (ojos.viendoAlJugador)
         {
             estadoActual = Estado.Persiguiendo;
+            enBusqueda = false;
             estaCambiandoDePunto = false;
             StopAllCoroutines();
 
@@ -57,19 +61,15 @@ public class MovimientoRutaPatrullero : MonoBehaviour
                 DetectionHUD.Instance.ReportTimer(this, tiempoDeteccion - timerDeteccion);
             }
 
-            // Si el tiempo llega al límite, perdemos
+            // Si el tiempo llega al límite
             if (timerDeteccion >= tiempoDeteccion)
             {
-                ActivarDerrota();
+                // Ya no mata, solo entra en persecución o sigue buscando
+                timerDeteccion = 0f;
             }
         }
         else
         {
-            // Si nos pierde de vista, vuelve a patrullar y resetea el contador
-            if (estadoActual == Estado.Persiguiendo)
-            {
-                estadoActual = Estado.Patrullando;
-            }
 
             timerDeteccion = 0f;
 
@@ -77,6 +77,11 @@ public class MovimientoRutaPatrullero : MonoBehaviour
             if (DetectionHUD.Instance != null)
             {
                 DetectionHUD.Instance.RemoveTimer(this);
+            }
+            // SOLO vuelve a patrulla si no está investigando una alerta
+            if (!enBusqueda && estadoActual == Estado.Persiguiendo)
+            {
+                estadoActual = Estado.Patrullando;
             }
         }
 
@@ -142,9 +147,27 @@ public class MovimientoRutaPatrullero : MonoBehaviour
 
     void PerseguirJugador()
     {
-        Vector3 destinoJugador = new Vector3(jugador.position.x, transform.position.y, jugador.position.z);
-        transform.position = Vector3.MoveTowards(transform.position, destinoJugador, velocidadPersecucion * Time.deltaTime);
-        GirarHacia(destinoJugador);
+        Vector3 destino;
+
+        if (enBusqueda)
+        {
+            destino = new Vector3(puntoAlerta.x, transform.position.y, puntoAlerta.z);
+        }
+        else
+        {
+            destino = new Vector3(jugador.position.x, transform.position.y, jugador.position.z);
+        }
+
+        transform.position = Vector3.MoveTowards(transform.position, destino, velocidadPersecucion * Time.deltaTime);
+        GirarHacia(destino);
+
+        // Si llega al punto de alerta, deja de buscar
+        if (enBusqueda && Vector3.Distance(transform.position, destino) < 0.2f)
+        {
+            enBusqueda = false;
+            estadoActual = Estado.Patrullando;
+            Debug.Log(gameObject.name + " llegó al último punto de detección.");
+        }
     }
 
     void GirarHacia(Vector3 objetivo)
@@ -158,7 +181,27 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         }
     }
 
-    void ActivarDerrota()
+    void OnEnable()
+    {
+        AlertaGlobal.OnAlertaGlobal += RecibirAlerta;
+    }
+
+    void OnDisable()
+    {
+        AlertaGlobal.OnAlertaGlobal -= RecibirAlerta;
+    }
+
+    void RecibirAlerta(Vector3 punto)
+    {
+        puntoAlerta = punto;
+        enBusqueda = true;
+        estadoActual = Estado.Persiguiendo;
+
+        Debug.Log(gameObject.name + " recibió alerta y va al punto.");
+    }
+
+    // DESACTIVADO PARA SPRINT 3
+    /*void ActivarDerrota()
     {
         derrotaActivada = true;
 
@@ -175,5 +218,5 @@ public class MovimientoRutaPatrullero : MonoBehaviour
             movimientoJugador.enabled = false;
 
         Time.timeScale = 0f; // Pausa el juego
-    }
+    }*/
 }
