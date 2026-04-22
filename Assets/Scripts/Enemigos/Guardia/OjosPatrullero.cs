@@ -22,6 +22,7 @@ public class OjosPatrullero : MonoBehaviour
         mr.material = new Material(materialCono);
         materialCono = mr.material;
         materialCono.color = colorNormal;
+        materialCono.renderQueue = 2450;
     }
 
     void Update()

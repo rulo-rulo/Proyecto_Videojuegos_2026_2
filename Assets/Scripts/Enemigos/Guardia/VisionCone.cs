@@ -33,10 +33,11 @@ public class VisionCone : MonoBehaviour
         GetComponent<MeshFilter>().mesh = mesh;
 
         MeshRenderer mr = GetComponent<MeshRenderer>();
-        mr.material         = new Material(visionConeMaterial);
-        visionConeMaterial  = mr.material;
+        mr.material = new Material(visionConeMaterial);
+        visionConeMaterial = mr.material;
 
         visionConeMaterial.color = normalColor;
+        visionConeMaterial.renderQueue = 2450;
 
         if (derrotaPanel != null)
             derrotaPanel.SetActive(false);
@@ -96,12 +97,12 @@ public class VisionCone : MonoBehaviour
 
     void DrawVisionCone()
     {
-        int      vertexCount = resolution + 1;
-        Vector3[] vertices   = new Vector3[vertexCount];
-        int[]     triangles  = new int[(resolution - 1) * 3];
+        int vertexCount = resolution + 1;
+        Vector3[] vertices = new Vector3[vertexCount];
+        int[] triangles = new int[(resolution - 1) * 3];
         vertices[0] = Vector3.zero;
 
-        float angleStep    = visionAngle / (resolution - 1);
+        float angleStep = visionAngle / (resolution - 1);
         float currentAngle = -visionAngle / 2;
 
         for (int i = 0; i < resolution; i++)
@@ -110,11 +111,13 @@ public class VisionCone : MonoBehaviour
             Vector3 dir = new Vector3(Mathf.Sin(rad), 0, Mathf.Cos(rad));
             dir = transform.rotation * dir;
 
-            Ray        ray = new Ray(transform.position, dir);
+            Ray ray = new Ray(transform.position, dir);
             RaycastHit hit;
             float distance = visionRange;
 
-            if (Physics.Raycast(ray, out hit, visionRange))
+            int mask = ~LayerMask.GetMask("Llave");
+
+            if (Physics.Raycast(ray, out hit, visionRange, mask, QueryTriggerInteraction.Ignore))
             {
                 distance = hit.distance;
 
@@ -131,13 +134,13 @@ public class VisionCone : MonoBehaviour
         for (int i = 0; i < resolution - 1; i++)
         {
             int index = i * 3;
-            triangles[index]     = 0;
+            triangles[index] = 0;
             triangles[index + 1] = i + 1;
             triangles[index + 2] = i + 2;
         }
 
         mesh.Clear();
-        mesh.vertices  = vertices;
+        mesh.vertices = vertices;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
     }
