@@ -9981,6 +9981,10 @@ PrefabInstance:
       propertyPath: derrotaPanel
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 4702607576262069625, guid: 3629e803f50d7784c81830184637ba68, type: 3}
+      propertyPath: tiempoDeteccion
+      value: 2.5
+      objectReference: {fileID: 0}
     - target: {fileID: 4886654808423711817, guid: 3629e803f50d7784c81830184637ba68, type: 3}
       propertyPath: m_Name
       value: camara_v2
