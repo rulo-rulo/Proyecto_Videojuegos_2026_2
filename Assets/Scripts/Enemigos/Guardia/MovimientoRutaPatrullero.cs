@@ -44,44 +44,50 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         // Si ya nos ha pillado y el juego está parado, no hacemos nada más
         if (derrotaActivada) return;
 
-        // LÓGICA DE VISIÓN Y TIEMPO
-        if (ojos.viendoAlJugador)
+        // SI ESTÁ EN BÚSQUEDA POR ALERTA, NO DEJES QUE LOS OJOS LO DEVUELVAN A PATRULLA
+        if (enBusqueda)
         {
             estadoActual = Estado.Persiguiendo;
-            enBusqueda = false;
-            estaCambiandoDePunto = false;
-            StopAllCoroutines();
-
-            // Acumulamos tiempo mientras te ve
-            timerDeteccion += Time.deltaTime;
-
-            // Avisamos al círculo/barra del HUD
-            if (DetectionHUD.Instance != null)
-            {
-                DetectionHUD.Instance.ReportTimer(this, tiempoDeteccion - timerDeteccion);
-            }
-
-            // Si el tiempo llega al límite
-            if (timerDeteccion >= tiempoDeteccion)
-            {
-                // Ya no mata, solo entra en persecución o sigue buscando
-                timerDeteccion = 0f;
-            }
         }
         else
         {
-
-            timerDeteccion = 0f;
-
-            // Borramos el círculo/barra del HUD
-            if (DetectionHUD.Instance != null)
+            // LÓGICA DE VISIÓN Y TIEMPO
+            if (ojos.viendoAlJugador)
             {
-                DetectionHUD.Instance.RemoveTimer(this);
+                estadoActual = Estado.Persiguiendo;
+                estaCambiandoDePunto = false;
+                StopAllCoroutines();
+
+                // Acumulamos tiempo mientras te ve
+                timerDeteccion += Time.deltaTime;
+
+                // Avisamos al círculo/barra del HUD
+                if (DetectionHUD.Instance != null)
+                {
+                    DetectionHUD.Instance.ReportTimer(this, tiempoDeteccion - timerDeteccion);
+                }
+
+                // Ya no mata al jugador
+                if (timerDeteccion >= tiempoDeteccion)
+                {
+                    timerDeteccion = 0f;
+                }
             }
-            // SOLO vuelve a patrulla si no está investigando una alerta
-            if (!enBusqueda && estadoActual == Estado.Persiguiendo)
+            else
             {
-                estadoActual = Estado.Patrullando;
+                // Si nos pierde de vista, vuelve a patrullar y resetea el contador
+                if (estadoActual == Estado.Persiguiendo)
+                {
+                    estadoActual = Estado.Patrullando;
+                }
+
+                timerDeteccion = 0f;
+
+                // Borramos el círculo/barra del HUD
+                if (DetectionHUD.Instance != null)
+                {
+                    DetectionHUD.Instance.RemoveTimer(this);
+                }
             }
         }
 
@@ -158,7 +164,12 @@ public class MovimientoRutaPatrullero : MonoBehaviour
             destino = new Vector3(jugador.position.x, transform.position.y, jugador.position.z);
         }
 
-        transform.position = Vector3.MoveTowards(transform.position, destino, velocidadPersecucion * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(
+            transform.position,
+            destino,
+            velocidadPersecucion * Time.deltaTime
+        );
+
         GirarHacia(destino);
 
         // Si llega al punto de alerta, deja de buscar
@@ -166,6 +177,7 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         {
             enBusqueda = false;
             estadoActual = Estado.Patrullando;
+
             Debug.Log(gameObject.name + " llegó al último punto de detección.");
         }
     }
@@ -196,8 +208,10 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         puntoAlerta = punto;
         enBusqueda = true;
         estadoActual = Estado.Persiguiendo;
+        estaCambiandoDePunto = false;
+        StopAllCoroutines();
 
-        Debug.Log(gameObject.name + " recibió alerta y va al punto.");
+        Debug.Log(gameObject.name + " recibió alerta y cambia a estado de búsqueda.");
     }
 
     // DESACTIVADO PARA SPRINT 3
