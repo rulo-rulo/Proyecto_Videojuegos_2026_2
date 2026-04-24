@@ -18,13 +18,13 @@ public class MovimientoRutaPatrullero : MonoBehaviour
     public float tiempoDeEspera = 1.5f;
     public float velocidadGiro = 5f;
 
-    [Header("Persecuci髇 y Derrota")]
+    [Header("Persecuci贸n y Derrota")]
     public float velocidadPersecucion = 5f;
     public float tiempoDeteccion = 1.5f;
     public GameObject derrotaPanel;
     public MonoBehaviour movimientoJugador;
 
-    [Header("Investigaci髇 por telequinesis")]
+    [Header("Investigaci贸n por telequinesis")]
     public float radioAlerta = 6f;
     public float tiempoInvestigacion = 1.5f;
 
@@ -36,6 +36,19 @@ public class MovimientoRutaPatrullero : MonoBehaviour
     private bool derrotaActivada = false;
 
     private Coroutine rutinaInvestigacionActual;
+
+    private Vector3 puntoAlerta;
+    private bool enBusqueda = false;
+
+    void OnEnable()
+    {
+        AlertaGlobal.OnAlertaGlobal += RecibirAlerta;
+    }
+
+    void OnDisable()
+    {
+        AlertaGlobal.OnAlertaGlobal -= RecibirAlerta;
+    }
 
     void Start()
     {
@@ -50,42 +63,59 @@ public class MovimientoRutaPatrullero : MonoBehaviour
     {
         if (derrotaActivada) return;
 
-        // L骻ica de visi髇 y tiempo
-        if (ojos != null && ojos.viendoAlJugador)
+        // SI EST脕 EN B脷SQUEDA POR ALERTA, NO DEJES QUE LOS OJOS LO DEVUELVAN A PATRULLA
+        if (enBusqueda)
         {
             estadoActual = Estado.Persiguiendo;
-            estaCambiandoDePunto = false;
-            StopAllCoroutines();
-            rutinaInvestigacionActual = null;
-
-            timerDeteccion += Time.deltaTime;
-
-            if (DetectionHUD.Instance != null)
-            {
-                DetectionHUD.Instance.ReportTimer(this, tiempoDeteccion - timerDeteccion);
-            }
-
-            if (timerDeteccion >= tiempoDeteccion)
-            {
-                ActivarDerrota();
-            }
         }
         else
         {
-            if (estadoActual == Estado.Persiguiendo)
+            // L贸gica de visi贸n y tiempo
+            if (ojos != null && ojos.viendoAlJugador)
             {
-                estadoActual = Estado.Patrullando;
+                estadoActual = Estado.Persiguiendo;
+                estaCambiandoDePunto = false;
+
+                if (rutinaInvestigacionActual != null)
+                {
+                    StopCoroutine(rutinaInvestigacionActual);
+                    rutinaInvestigacionActual = null;
+                }
+
+                // Acumulamos tiempo mientras te ve
+                timerDeteccion += Time.deltaTime;
+
+                // Avisamos al c铆rculo/barra del HUD
+                if (DetectionHUD.Instance != null)
+                {
+                    DetectionHUD.Instance.ReportTimer(this, tiempoDeteccion - timerDeteccion);
+                }
+
+                // Ya no mata al jugador
+                if (timerDeteccion >= tiempoDeteccion)
+                {
+                    timerDeteccion = 0f;
+                }
             }
-
-            timerDeteccion = 0f;
-
-            if (DetectionHUD.Instance != null)
+            else
             {
-                DetectionHUD.Instance.RemoveTimer(this);
+                // Si nos pierde de vista, vuelve a patrullar y resetea el contador
+                if (estadoActual == Estado.Persiguiendo)
+                {
+                    estadoActual = Estado.Patrullando;
+                }
+
+                timerDeteccion = 0f;
+
+                // Borramos el c铆rculo/barra del HUD
+                if (DetectionHUD.Instance != null)
+                {
+                    DetectionHUD.Instance.RemoveTimer(this);
+                }
             }
         }
 
-        // L骻ica de movimiento
+        // L贸gica de movimiento
         switch (estadoActual)
         {
             case Estado.Patrullando:
@@ -93,7 +123,7 @@ public class MovimientoRutaPatrullero : MonoBehaviour
                 break;
 
             case Estado.Investigando:
-                // El movimiento de investigaci髇 lo controla la coroutine
+                // El movimiento de investigaci贸n lo controla la coroutine
                 break;
 
             case Estado.Persiguiendo:
@@ -160,16 +190,34 @@ public class MovimientoRutaPatrullero : MonoBehaviour
 
     void PerseguirJugador()
     {
-        Vector3 destinoJugador = new Vector3(jugador.position.x, rb.position.y, jugador.position.z);
+        Vector3 destino;
+
+        if (enBusqueda)
+        {
+            destino = new Vector3(puntoAlerta.x, rb.position.y, puntoAlerta.z);
+        }
+        else
+        {
+            destino = new Vector3(jugador.position.x, rb.position.y, jugador.position.z);
+        }
 
         Vector3 nuevaPos = Vector3.MoveTowards(
             rb.position,
-            destinoJugador,
+            destino,
             velocidadPersecucion * Time.deltaTime
         );
 
         rb.MovePosition(nuevaPos);
-        GirarHacia(destinoJugador);
+        GirarHacia(destino);
+
+        // Si llega al punto de alerta, deja de buscar
+        if (enBusqueda && Vector3.Distance(rb.position, destino) < 0.2f)
+        {
+            enBusqueda = false;
+            estadoActual = Estado.Patrullando;
+
+            Debug.Log(gameObject.name + " lleg贸 al 煤ltimo punto de detecci贸n.");
+        }
     }
 
     void GirarHacia(Vector3 objetivo)
@@ -199,9 +247,7 @@ public class MovimientoRutaPatrullero : MonoBehaviour
             StopCoroutine(rutinaInvestigacionActual);
         }
 
-        StopAllCoroutines();
         estaCambiandoDePunto = false;
-
         rutinaInvestigacionActual = StartCoroutine(IrAInvestigar(posicionInteraccion));
     }
 
@@ -233,6 +279,24 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         estaCambiandoDePunto = false;
     }
 
+    void RecibirAlerta(Vector3 punto)
+    {
+        puntoAlerta = punto;
+        enBusqueda = true;
+        estadoActual = Estado.Persiguiendo;
+        estaCambiandoDePunto = false;
+
+        if (rutinaInvestigacionActual != null)
+        {
+            StopCoroutine(rutinaInvestigacionActual);
+            rutinaInvestigacionActual = null;
+        }
+
+        Debug.Log(gameObject.name + " recibi贸 alerta y cambia a estado de b煤squeda.");
+    }
+
+    // DESACTIVADO PARA SPRINT 3
+    /*
     void ActivarDerrota()
     {
         derrotaActivada = true;
@@ -249,6 +313,7 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         if (movimientoJugador != null)
             movimientoJugador.enabled = false;
 
-        Time.timeScale = 0f;
+        Time.timeScale = 0f; // Pausa el juego
     }
+    */
 }
