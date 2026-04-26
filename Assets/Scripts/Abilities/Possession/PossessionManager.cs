@@ -38,14 +38,14 @@ namespace Possession
         {
             inputHandler = GetComponent<InputHandler>();
             inputHandler.OnPossessionKeyPressed += HandlePossessionInput;
-            inputHandler.OnCancelKeyPressed += HandleCancelInput;
+            // Hemos borrado la suscripción al botón de cancelar
             playerColliders = playerTransform.GetComponentsInChildren<Collider>();
         }
 
         private void OnDestroy()
         {
             inputHandler.OnPossessionKeyPressed -= HandlePossessionInput;
-            inputHandler.OnCancelKeyPressed -= HandleCancelInput;
+            // Hemos borrado la suscripción al botón de cancelar
         }
 
         private void Update()
@@ -119,32 +119,39 @@ namespace Possession
                     break;
 
                 case PossessionState.Scanning:
-                    TryPossess();
+                    // Si estamos apuntando a algo, lo poseemos. 
+                    // Si no, usamos la Z para apagar el escáner.
+                    if (currentTarget != null)
+                    {
+                        TryPossess();
+                    }
+                    else
+                    {
+                        CancelScanning();
+                    }
+                    break;
+
+                case PossessionState.Possessing:
+                    // Si volvemos a pulsar Z mientras poseemos, salimos.
+                    isTimerRunning = false;
+                    Depossess();
                     break;
             }
         }
 
         // -------------------------------------------------- Gestión de Estados
 
-        private void HandleCancelInput()
+        private void CancelScanning()
         {
-            // 1. Si pulsas Backspace mientras escaneas, cancela el escaneo
-            if (currentState == PossessionState.Scanning)
-            {
-                if (uiCooldown != null) uiCooldown.EstablecerUsoActivo(false);
+            // Apagamos el icono si decidimos cancelar el escaneo
+            if (uiCooldown != null) uiCooldown.EstablecerUsoActivo(false);
 
-                AbilityManager.Instance.ClearAbility(this);
-                outlineController.HideOutlines();
-                currentTarget = null;
-                currentState = PossessionState.Free;
-                Debug.Log("[Possession] Escaneo cancelado.");
-            }
-            // 2. Si pulsas Backspace mientras posees, sales del objeto
-            else if (currentState == PossessionState.Possessing)
-            {
-                isTimerRunning = false; // Detenemos el reloj de posesión
-                Depossess();
-            }
+            AbilityManager.Instance.ClearAbility(this);
+
+            outlineController.HideOutlines();
+            currentTarget = null;
+            currentState = PossessionState.Free;
+            Debug.Log("[Possession] Escaneo cancelado.");
         }
 
         private void EnterScanning()
