@@ -5,8 +5,14 @@ namespace Telekinesis
 {
     public class TelekinesisInputHandler : MonoBehaviour
     {
+        [Header("Teclado")]
         [SerializeField] private KeyCode actionKey = KeyCode.X;
         [SerializeField] private KeyCode cancelKey = KeyCode.Backspace;
+
+        [Header("Mando")]
+        [SerializeField] private KeyCode actionMando = KeyCode.JoystickButton5;
+
+        [SerializeField] private KeyCode cancelMando = KeyCode.JoystickButton1;
 
         public event UnityAction OnActionKeyPressed;
         public event UnityAction OnCancelKeyPressed;
@@ -15,10 +21,12 @@ namespace Telekinesis
 
         private void Update()
         {
-            if (Input.GetKeyDown(actionKey))
+            // Detectamos la X del teclado O el RB/R1 del mando
+            if (Input.GetKeyDown(actionKey) || Input.GetKeyDown(actionMando))
                 OnActionKeyPressed?.Invoke();
 
-            if (Input.GetKeyDown(cancelKey))
+            // Detectamos el Backspace del teclado O la A/X del mando
+            if (Input.GetKeyDown(cancelKey) || Input.GetKeyDown(cancelMando))
                 OnCancelKeyPressed?.Invoke();
 
             ReadDirection();
