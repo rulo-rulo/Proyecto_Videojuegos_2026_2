@@ -17,15 +17,14 @@ namespace Telekinesis
         public event UnityAction OnActionKeyPressed;
         public event UnityAction OnCancelKeyPressed;
 
-        public Vector3 LastDirection { get; private set; } = Vector3.up;
+        // Cambiamos el valor por defecto a forward (hacia adelante)
+        public Vector3 LastDirection { get; private set; } = Vector3.forward;
 
         private void Update()
         {
-            // Detectamos la X del teclado O el RB/R1 del mando
             if (Input.GetKeyDown(actionKey) || Input.GetKeyDown(actionMando))
                 OnActionKeyPressed?.Invoke();
 
-            // Detectamos el Backspace del teclado O la A/X del mando
             if (Input.GetKeyDown(cancelKey) || Input.GetKeyDown(cancelMando))
                 OnCancelKeyPressed?.Invoke();
 
@@ -34,14 +33,21 @@ namespace Telekinesis
 
         private void ReadDirection()
         {
-            if (Input.GetKeyDown(KeyCode.UpArrow))
-                LastDirection = Vector3.forward;
-            else if (Input.GetKeyDown(KeyCode.DownArrow))
-                LastDirection = Vector3.back;
-            else if (Input.GetKeyDown(KeyCode.LeftArrow))
-                LastDirection = Vector3.left;
-            else if (Input.GetKeyDown(KeyCode.RightArrow))
-                LastDirection = Vector3.right;
+            // 1. Leemos el teclado y el mando juntos
+            float h = Input.GetAxisRaw("Horizontal") + Input.GetAxisRaw("MandoHorizontal");
+            float v = Input.GetAxisRaw("Vertical") + Input.GetAxisRaw("MandoVertical");
+
+            // 2. Clampeamos para evitar sumar más de 1
+            h = Mathf.Clamp(h, -1f, 1f);
+            v = Mathf.Clamp(v, -1f, 1f);
+
+            // 3. Si el jugador está moviendo el joystick o las teclas, guardamos esa dirección
+            if (Mathf.Abs(h) > 0.1f || Mathf.Abs(v) > 0.1f)
+            {
+                // La X es horizontal, la Z es la profundidad (adelante/atrás)
+                LastDirection = new Vector3(h, 0, v).normalized;
+            }
+            // Si el jugador suelta el mando, LastDirection recordará la última dirección hacia la que estaba apuntando.
         }
     }
 }

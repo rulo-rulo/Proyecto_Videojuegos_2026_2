@@ -56,8 +56,17 @@ public class Dash : MonoBehaviour
 
     private Vector3 GetDirection()
     {
+        // 1. Leemos el teclado por defecto
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
+
+        // 2. Leemos también los ejes del joystick que usas en tu movimiento
+        h += Input.GetAxisRaw("MandoHorizontal");
+        v += Input.GetAxisRaw("MandoVertical");
+
+        // 3. Clampeamos para que, si pulsas teclado y mando a la vez, no corra el doble
+        h = Mathf.Clamp(h, -1f, 1f);
+        v = Mathf.Clamp(v, -1f, 1f);
 
         Vector3 forward = playerCam.forward;
         Vector3 right = playerCam.right;
@@ -66,7 +75,10 @@ public class Dash : MonoBehaviour
         forward.Normalize();
         right.Normalize();
 
+        // 4. Si después de comprobar teclado Y mando no hay movimiento, dash hacia adelante
         if (h == 0 && v == 0) return forward;
+
+        // 5. Si hay movimiento, calculamos la diagonal correcta
         return (forward * v + right * h).normalized;
     }
 }

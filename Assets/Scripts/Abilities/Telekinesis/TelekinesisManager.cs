@@ -169,18 +169,22 @@ namespace Telekinesis
 
         private Vector3 GetWorldDirection(Vector3 localDir)
         {
-            // Convierte la dirección local (flechas) a dirección relativa a la cámara
             Transform cam = Camera.main.transform;
 
+            // Obtenemos los vectores hacia adelante y a la derecha de la cámara, ignorando la altura (Y)
             Vector3 camForward = Vector3.ProjectOnPlane(cam.forward, Vector3.up).normalized;
-            Vector3 camRight   = Vector3.ProjectOnPlane(cam.right,   Vector3.up).normalized;
+            Vector3 camRight = Vector3.ProjectOnPlane(cam.right, Vector3.up).normalized;
 
-            if (localDir == Vector3.forward) return camForward;
-            if (localDir == Vector3.back)    return -camForward;
-            if (localDir == Vector3.right)   return camRight;
-            if (localDir == Vector3.left)    return -camRight;
+            // Multiplicamos la inclinación del joystick por la rotación de la cámara
+            Vector3 finalDirection = (camForward * localDir.z + camRight * localDir.x).normalized;
 
-            return cam.up; // Vector3.up por defecto → arriba relativo a la cámara
+            // Por seguridad: si la dirección final es 0 (algo raro pasó), lo empujamos hacia arriba
+            if (finalDirection.sqrMagnitude < 0.01f)
+            {
+                return cam.up;
+            }
+
+            return finalDirection;
         }
 
         // -------------------------------------------------- Detección
