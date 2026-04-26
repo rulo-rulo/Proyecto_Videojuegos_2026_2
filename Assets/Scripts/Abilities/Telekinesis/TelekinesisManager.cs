@@ -115,6 +115,8 @@ namespace Telekinesis
             if (nearbyObjects.Count > 0)
                 outlineController.ShowOutlines(nearbyObjects, currentTarget);
 
+            if (uiCooldown != null) uiCooldown.EstablecerUsoActivo(true);
+
             Debug.Log("[Telekinesis] Escaneando.");
         }
 
@@ -150,6 +152,8 @@ namespace Telekinesis
 
         private void Cancel()
         {
+            if (uiCooldown != null) uiCooldown.EstablecerUsoActivo(false);
+
             AbilityManager.Instance.ClearAbility(this);
             
             if (currentState == TelekinesisState.Idle) return;

@@ -131,6 +131,8 @@ namespace Possession
             // 1. Si pulsas Backspace mientras escaneas, cancela el escaneo
             if (currentState == PossessionState.Scanning)
             {
+                if (uiCooldown != null) uiCooldown.EstablecerUsoActivo(false);
+
                 AbilityManager.Instance.ClearAbility(this);
                 outlineController.HideOutlines();
                 currentTarget = null;
@@ -147,6 +149,8 @@ namespace Possession
 
         private void EnterScanning()
         {
+            if (uiCooldown != null) uiCooldown.EstablecerUsoActivo(true);
+
             AbilityManager.Instance.RegisterAbility(this);
 
             nearbyPossessables = FindAllNearby();
@@ -187,6 +191,8 @@ namespace Possession
 
         private void Depossess()
         {
+            if (uiCooldown != null) uiCooldown.EstablecerUsoActivo(false);
+
             AbilityManager.Instance.ClearAbility(this);
 
             if (currentTarget == null) return;

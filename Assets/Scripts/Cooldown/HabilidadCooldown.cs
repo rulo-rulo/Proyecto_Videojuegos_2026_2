@@ -4,26 +4,32 @@ using TMPro;
 
 public class HabilidadCooldown : MonoBehaviour
 {
-    [Header("Referencias")]
+    [Header("Referencias (Sombra de Recarga)")]
     public Dash scriptDash;
     public Image imagenSombra;
     public TextMeshProUGUI textoContador;
 
-    [Header("Ajustes de Input")]
+    [Header("Ajustes de Teclas")]
     public KeyCode teclaTeclado = KeyCode.LeftShift;
-    [Tooltip("El nombre que le pusiste en el Input Manager")]
-    public string ejeGatilloMando = "GatilloIzquierdo";
+    public KeyCode teclaMando = KeyCode.JoystickButton4;
 
     [Header("Ajustes de Tiempo")]
     public float tiempoEnfriamiento = 5f;
 
+    [Header("Colores cuando la habilidad se está usando")]
+    public Color colorNormal = Color.white;
+    public Color colorActivo = new Color(0.4f, 0.4f, 0.4f, 1f);
+
+    private Image imagenBase;
     private float timer = 0f;
     private bool estaEnEnfriamiento = false;
 
-    // Esta variable evita que el gatillo se dispare varias veces seguidas si lo mantienes apretado
-    private bool gatilloYaPulsado = false;
-
     public bool EstaEnEnfriamiento => estaEnEnfriamiento;
+
+    void Awake()
+    {
+        imagenBase = GetComponent<Image>();
+    }
 
     void Start()
     {
@@ -39,27 +45,7 @@ public class HabilidadCooldown : MonoBehaviour
         }
         else
         {
-            // 1. Comprobamos el TECLADO (Funciona igual)
-            bool pulsoTeclado = Input.GetKeyDown(teclaTeclado);
-
-            // 2. Comprobamos el MANDO (Gatillo)
-            bool pulsoMando = false;
-            float valorGatillo = Input.GetAxisRaw(ejeGatilloMando);
-
-            // Si apretamos el gatillo a más de la mitad y NO estaba ya apretado...
-            if (valorGatillo > 0.5f && !gatilloYaPulsado)
-            {
-                pulsoMando = true;
-                gatilloYaPulsado = true; // Bloqueamos para que no se dispare en bucle
-            }
-            // Si soltamos el gatillo (vuelve casi a 0), reseteamos el seguro
-            else if (valorGatillo <= 0.1f)
-            {
-                gatilloYaPulsado = false;
-            }
-
-            // 3. Ejecutamos si se pulsó cualquiera de los dos
-            if (pulsoTeclado || pulsoMando)
+            if (Input.GetKeyDown(teclaTeclado) || Input.GetKeyDown(teclaMando))
             {
                 if (scriptDash != null && scriptDash.ExecuteDash())
                 {
@@ -88,11 +74,16 @@ public class HabilidadCooldown : MonoBehaviour
         }
         else
         {
-            if (imagenSombra != null)
-                imagenSombra.fillAmount = timer / tiempoEnfriamiento;
+            if (imagenSombra != null) imagenSombra.fillAmount = timer / tiempoEnfriamiento;
+            if (textoContador != null) textoContador.text = Mathf.Ceil(timer).ToString();
+        }
+    }
 
-            if (textoContador != null)
-                textoContador.text = Mathf.Ceil(timer).ToString();
+    public void EstablecerUsoActivo(bool enUso)
+    {
+        if (imagenBase != null)
+        {
+            imagenBase.color = enUso ? colorActivo : colorNormal;
         }
     }
 }

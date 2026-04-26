@@ -644,8 +644,10 @@ MonoBehaviour:
   imagenSombra: {fileID: 250728770}
   textoContador: {fileID: 0}
   teclaTeclado: 304
-  ejeGatilloMando: GatilloIzquierdo
+  teclaMando: 334
   tiempoEnfriamiento: 5
+  colorNormal: {r: 1, g: 1, b: 1, a: 1}
+  colorActivo: {r: 0.4, g: 0.4, b: 0.4, a: 1}
 --- !u!1 &69060236
 GameObject:
   m_ObjectHideFlags: 0
@@ -2015,8 +2017,10 @@ MonoBehaviour:
   imagenSombra: {fileID: 1230460700}
   textoContador: {fileID: 0}
   teclaTeclado: 101
-  ejeGatilloMando: GatilloIzquierdo
+  teclaMando: 334
   tiempoEnfriamiento: 5
+  colorNormal: {r: 1, g: 1, b: 1, a: 1}
+  colorActivo: {r: 0.4, g: 0.4, b: 0.4, a: 1}
 --- !u!114 &322296179
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6239,8 +6243,10 @@ MonoBehaviour:
   imagenSombra: {fileID: 673586697}
   textoContador: {fileID: 0}
   teclaTeclado: 101
-  ejeGatilloMando: GatilloIzquierdo
+  teclaMando: 334
   tiempoEnfriamiento: 5
+  colorNormal: {r: 1, g: 1, b: 1, a: 1}
+  colorActivo: {r: 0.4, g: 0.4, b: 0.4, a: 1}
 --- !u!114 &1073159617
 MonoBehaviour:
   m_ObjectHideFlags: 0
