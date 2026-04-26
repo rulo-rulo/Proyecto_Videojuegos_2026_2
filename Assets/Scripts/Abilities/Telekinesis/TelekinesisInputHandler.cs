@@ -17,7 +17,6 @@ namespace Telekinesis
         public event UnityAction OnActionKeyPressed;
         public event UnityAction OnCancelKeyPressed;
 
-        // Cambiamos el valor por defecto a forward (hacia adelante)
         public Vector3 LastDirection { get; private set; } = Vector3.forward;
 
         private void Update()

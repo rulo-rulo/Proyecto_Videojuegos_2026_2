@@ -27,7 +27,7 @@ public class HabilidadCooldown : MonoBehaviour
     private Image imagenBase;
     private float timer = 0f;
     private bool estaEnEnfriamiento = false;
-    private bool gatilloYaPulsado = false; // Seguro anti-spam para el gatillo
+    private bool gatilloYaPulsado = false;
 
     public bool EstaEnEnfriamiento => estaEnEnfriamiento;
 

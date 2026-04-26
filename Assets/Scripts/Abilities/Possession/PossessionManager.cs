@@ -16,7 +16,7 @@ namespace Possession
         [SerializeField] private float possessionDuration = 5f;
 
         [Header("Sistema de Cooldown UI")]
-        [SerializeField] private HabilidadCooldown uiCooldown; // Referencia al icono de la mano en la UI
+        [SerializeField] private HabilidadCooldown uiCooldown;
 
         private InputHandler inputHandler;
         private PossessionState currentState = PossessionState.Free;
@@ -38,14 +38,12 @@ namespace Possession
         {
             inputHandler = GetComponent<InputHandler>();
             inputHandler.OnPossessionKeyPressed += HandlePossessionInput;
-            // Hemos borrado la suscripción al botón de cancelar
             playerColliders = playerTransform.GetComponentsInChildren<Collider>();
         }
 
         private void OnDestroy()
         {
             inputHandler.OnPossessionKeyPressed -= HandlePossessionInput;
-            // Hemos borrado la suscripción al botón de cancelar
         }
 
         private void Update()
