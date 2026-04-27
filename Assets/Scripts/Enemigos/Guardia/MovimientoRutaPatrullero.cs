@@ -14,13 +14,13 @@ public class MovimientoRutaPatrullero : MonoBehaviour
     [Header("Ruta de Patrulla")]
     public Transform puntoA;
     public Transform puntoB;
-    public float velocidadPatrulla = 3f;
+    public float velocidadPatrulla = 2f;
     public float tiempoDeEspera = 1.5f;
-    public float velocidadGiro = 5f;
+    public float velocidadGiro = 3f;
 
     [Header("Persecución y Derrota")]
-    public float velocidadPersecucion = 5f;
-    public float tiempoDeteccion = 1.5f;
+    public float velocidadPersecucion = 3f;
+    public float tiempoDeteccion = 5f;
     public GameObject derrotaPanel;
     public MonoBehaviour movimientoJugador;
 

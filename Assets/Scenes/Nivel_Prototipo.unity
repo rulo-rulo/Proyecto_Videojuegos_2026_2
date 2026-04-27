@@ -419,7 +419,7 @@ GameObject:
   m_Component:
   - component: {fileID: 38829389}
   m_Layer: 0
-  m_Name: PuntosEnemigoPrincipal
+  m_Name: PuntosEnemigoMuroSilla
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -644,7 +644,7 @@ MonoBehaviour:
   imagenSombra: {fileID: 250728770}
   textoContador: {fileID: 0}
   teclaTeclado: 304
-  teclaMando: 334
+  ejeGatilloMando: GatilloIzquierdo
   tiempoEnfriamiento: 5
   colorNormal: {r: 1, g: 1, b: 1, a: 1}
   colorActivo: {r: 0.4, g: 0.4, b: 0.4, a: 1}
@@ -2017,7 +2017,7 @@ MonoBehaviour:
   imagenSombra: {fileID: 1230460700}
   textoContador: {fileID: 0}
   teclaTeclado: 101
-  teclaMando: 334
+  ejeGatilloMando: GatilloIzquierdo
   tiempoEnfriamiento: 5
   colorNormal: {r: 1, g: 1, b: 1, a: 1}
   colorActivo: {r: 0.4, g: 0.4, b: 0.4, a: 1}
@@ -6243,7 +6243,7 @@ MonoBehaviour:
   imagenSombra: {fileID: 673586697}
   textoContador: {fileID: 0}
   teclaTeclado: 101
-  teclaMando: 334
+  ejeGatilloMando: GatilloIzquierdo
   tiempoEnfriamiento: 5
   colorNormal: {r: 1, g: 1, b: 1, a: 1}
   colorActivo: {r: 0.4, g: 0.4, b: 0.4, a: 1}
@@ -7283,7 +7283,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3780348248182164018, guid: 772bcb8039c8d62489c7b1de889ec7a4, type: 3}
       propertyPath: m_Name
-      value: EnemigoSimple2
+      value: "Polic\xEDaPasillo"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9424,7 +9424,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3780348248182164018, guid: 772bcb8039c8d62489c7b1de889ec7a4, type: 3}
       propertyPath: m_Name
-      value: EnemigoSimple
+      value: PoliciaMuroSilla
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9466,9 +9466,9 @@ MonoBehaviour:
   puntoA: {fileID: 1486183671}
   puntoB: {fileID: 1042933068}
   velocidadPatrulla: 2
-  tiempoDeEspera: 0.5
-  velocidadGiro: 2
-  velocidadPersecucion: 2
+  tiempoDeEspera: 1.5
+  velocidadGiro: 3
+  velocidadPersecucion: 3
   tiempoDeteccion: 5
   derrotaPanel: {fileID: 0}
   movimientoJugador: {fileID: 1639417671}
@@ -9996,7 +9996,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4886654808423711817, guid: 3629e803f50d7784c81830184637ba68, type: 3}
       propertyPath: m_Name
-      value: camara_v2
+      value: CamaraVigilancia
       objectReference: {fileID: 0}
     - target: {fileID: 5231830388216471283, guid: 3629e803f50d7784c81830184637ba68, type: 3}
       propertyPath: m_LocalPosition.x
