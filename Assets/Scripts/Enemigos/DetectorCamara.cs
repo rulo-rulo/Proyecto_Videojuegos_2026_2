@@ -106,7 +106,7 @@ public class DetectorCamara : MonoBehaviour
                         hayContacto = true;
                 }
 
-                vertices.Add(dirLocal * distanciaFinal);
+                vertices.Add(transform.InverseTransformPoint(transform.position + dirGlobal * distanciaFinal));
             }
         }
 
