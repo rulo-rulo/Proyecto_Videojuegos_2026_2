@@ -79,4 +79,24 @@ public class OjosPatrullero : MonoBehaviour
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
     }
+
+    public bool PuedeVerObjeto(Transform objetivo)
+    {
+        if (objetivo == null) return false;
+
+        Vector3 direccion = objetivo.position - transform.position;
+        direccion.y = 0f;
+
+        float distancia = direccion.magnitude;
+
+        if (distancia > rangoVision)
+            return false;
+
+        float angulo = Vector3.Angle(transform.forward, direccion.normalized);
+
+        if (angulo > anguloVision * 0.5f)
+            return false;
+
+        return true;
+    }
 }
