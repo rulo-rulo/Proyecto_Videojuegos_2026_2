@@ -18,15 +18,14 @@ public class MovimientoRutaPatrullero : MonoBehaviour
     public float tiempoDeEspera = 1.5f;
     public float velocidadGiro = 3f;
 
-    [Header("Persecución y Derrota")]
+    [Header("Persecución")]
     public float velocidadPersecucion = 3f;
     public float tiempoDeteccion = 5f;
-    public GameObject derrotaPanel;
-    public MonoBehaviour movimientoJugador;
 
-    [Header("Investigación por telequinesis")]
-    public float radioAlerta = 6f;
-    public float tiempoInvestigacion = 1.5f;
+    [Header("Investigación por Ruido")]
+    // Hemos quitado el radioAlerta porque ahora el propio objeto calcula si la onda le llega al enemigo
+    [Tooltip("Tiempo que se queda quieto mirando el punto donde sonó el golpe antes de volver a su ruta.")]
+    public float tiempoInvestigacion = 2.5f;
 
     private Transform destinoActual;
     private bool estaCambiandoDePunto = false;
@@ -63,35 +62,32 @@ public class MovimientoRutaPatrullero : MonoBehaviour
     {
         if (derrotaActivada) return;
 
-        // SI ESTÁ EN BÚSQUEDA POR ALERTA, NO DEJES QUE LOS OJOS LO DEVUELVAN A PATRULLA
         if (enBusqueda)
         {
             estadoActual = Estado.Persiguiendo;
         }
         else
         {
-            // Lógica de visión y tiempo
+            // Lógica de visión
             if (ojos != null && ojos.viendoAlJugador)
             {
                 estadoActual = Estado.Persiguiendo;
                 estaCambiandoDePunto = false;
 
+                // Si nos ve mientras investigaba un ruido, cancela la investigación para perseguirnos
                 if (rutinaInvestigacionActual != null)
                 {
                     StopCoroutine(rutinaInvestigacionActual);
                     rutinaInvestigacionActual = null;
                 }
 
-                // Acumulamos tiempo mientras te ve
                 timerDeteccion += Time.deltaTime;
 
-                // Avisamos al círculo/barra del HUD
                 if (DetectionHUD.Instance != null)
                 {
                     DetectionHUD.Instance.ReportTimer(this, tiempoDeteccion - timerDeteccion);
                 }
 
-                // Ya no mata al jugador
                 if (timerDeteccion >= tiempoDeteccion)
                 {
                     timerDeteccion = 0f;
@@ -99,7 +95,7 @@ public class MovimientoRutaPatrullero : MonoBehaviour
             }
             else
             {
-                // Si nos pierde de vista, vuelve a patrullar y resetea el contador
+                // Si nos pierde de vista, vuelve a patrullar
                 if (estadoActual == Estado.Persiguiendo)
                 {
                     estadoActual = Estado.Patrullando;
@@ -107,7 +103,6 @@ public class MovimientoRutaPatrullero : MonoBehaviour
 
                 timerDeteccion = 0f;
 
-                // Borramos el círculo/barra del HUD
                 if (DetectionHUD.Instance != null)
                 {
                     DetectionHUD.Instance.RemoveTimer(this);
@@ -115,7 +110,7 @@ public class MovimientoRutaPatrullero : MonoBehaviour
             }
         }
 
-        // Lógica de movimiento
+        // Lógica de estados
         switch (estadoActual)
         {
             case Estado.Patrullando:
@@ -123,7 +118,7 @@ public class MovimientoRutaPatrullero : MonoBehaviour
                 break;
 
             case Estado.Investigando:
-                // El movimiento de investigación lo controla la coroutine
+                // Se maneja solo dentro de la Coroutine 'IrAInvestigar'
                 break;
 
             case Estado.Persiguiendo:
@@ -193,13 +188,9 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         Vector3 destino;
 
         if (enBusqueda)
-        {
             destino = new Vector3(puntoAlerta.x, rb.position.y, puntoAlerta.z);
-        }
         else
-        {
             destino = new Vector3(jugador.position.x, rb.position.y, jugador.position.z);
-        }
 
         Vector3 nuevaPos = Vector3.MoveTowards(
             rb.position,
@@ -210,12 +201,10 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         rb.MovePosition(nuevaPos);
         GirarHacia(destino);
 
-        // Si llega al punto de alerta, deja de buscar
         if (enBusqueda && Vector3.Distance(rb.position, destino) < 0.2f)
         {
             enBusqueda = false;
             estadoActual = Estado.Patrullando;
-
             Debug.Log(gameObject.name + " llegó al último punto de detección.");
         }
     }
@@ -232,16 +221,19 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         }
     }
 
+    // -------------------------------------------------- INVESTIGACIÓN
+
+    // Este método es llamado por el MovableObject cuando la onda de sonido lo toca
     public void ReportarInteraccion(Vector3 posicionInteraccion)
     {
         if (derrotaActivada) return;
+
+        // Si ya nos está persiguiendo (viendo), ignora los ruidos de las cajas
         if (estadoActual == Estado.Persiguiendo) return;
 
-        float distancia = Vector3.Distance(transform.position, posicionInteraccion);
+        Debug.Log($"[{gameObject.name}] Escuchó un ruido. Yendo a investigar...");
 
-        if (distancia > radioAlerta)
-            return;
-
+        // Si ya estaba investigando otro ruido, lo cancela para ir al ruido más nuevo
         if (rutinaInvestigacionActual != null)
         {
             StopCoroutine(rutinaInvestigacionActual);
@@ -257,26 +249,26 @@ public class MovimientoRutaPatrullero : MonoBehaviour
 
         Vector3 puntoPlano = new Vector3(punto.x, rb.position.y, punto.z);
 
-        while (Vector3.Distance(
-            new Vector3(rb.position.x, 0, rb.position.z),
-            new Vector3(puntoPlano.x, 0, puntoPlano.z)) > 0.2f)
+        // 1. Camina hacia el origen del sonido
+        while (Vector3.Distance(new Vector3(rb.position.x, 0, rb.position.z), puntoPlano) > 0.2f)
         {
-            Vector3 nuevaPos = Vector3.MoveTowards(
-                rb.position,
-                puntoPlano,
-                velocidadPatrulla * Time.deltaTime
-            );
-
+            Vector3 nuevaPos = Vector3.MoveTowards(rb.position, puntoPlano, velocidadPatrulla * Time.deltaTime);
             rb.MovePosition(nuevaPos);
             GirarHacia(puntoPlano);
             yield return null;
         }
 
+        // 2. Al llegar, se queda quieto el tiempo marcado en 'tiempoInvestigacion'
+        Debug.Log($"[{gameObject.name}] Llegó al origen del ruido. Investigando...");
         yield return new WaitForSeconds(tiempoInvestigacion);
 
+        // 3. Termina de investigar y vuelve a su ruta normal
+        Debug.Log($"[{gameObject.name}] Falsa alarma. Volviendo a patrullar.");
         rutinaInvestigacionActual = null;
         estadoActual = Estado.Patrullando;
-        estaCambiandoDePunto = false;
+
+        // Al dejar 'destinoActual' intacto, el Update volverá a llamar a MoverHaciaDestino() 
+        // y el enemigo regresará automáticamente al punto de la ruta en el que se había quedado.
     }
 
     void RecibirAlerta(Vector3 punto)
@@ -291,29 +283,5 @@ public class MovimientoRutaPatrullero : MonoBehaviour
             StopCoroutine(rutinaInvestigacionActual);
             rutinaInvestigacionActual = null;
         }
-
-        Debug.Log(gameObject.name + " recibió alerta y cambia a estado de búsqueda.");
     }
-
-    // DESACTIVADO PARA SPRINT 3
-    /*
-    void ActivarDerrota()
-    {
-        derrotaActivada = true;
-
-        if (DetectionHUD.Instance != null)
-            DetectionHUD.Instance.RemoveTimer(this);
-
-        if (GameManager.Instance != null)
-            GameManager.Instance.FinalizarDerrota();
-
-        if (derrotaPanel != null)
-            derrotaPanel.SetActive(true);
-
-        if (movimientoJugador != null)
-            movimientoJugador.enabled = false;
-
-        Time.timeScale = 0f; // Pausa el juego
-    }
-    */
 }

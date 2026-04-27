@@ -12,14 +12,20 @@ namespace Telekinesis
         [SerializeField] private float multiplicadorRuido = 1.5f;
         [SerializeField] private float radioMaximoSonido = 30f;
 
+        [Header("Sistema de Sonido (Ruido de Arrastre)")]
+        [Tooltip("Velocidad mínima deslizando para que haga ruido.")]
+        [SerializeField] private float umbralArrastre = 1f;
+        [Tooltip("Cada cuántos segundos suelta una onda mientras raspa el suelo.")]
+        [SerializeField] private float intervaloRuidoArrastre = 0.4f;
+        [Tooltip("Multiplicador para el arrastre (suele ser más bajito que el golpe seco).")]
+        [SerializeField] private float multiplicadorRuidoArrastre = 0.8f;
+
         [Header("Fricción por Script")]
-        [Tooltip("Qué tan rápido frena el objeto al tocar el suelo.")]
-        [SerializeField] private float fuerzaFrenado = 2f;
-        [Tooltip("Si la velocidad baja de este número, el objeto se detiene por completo.")]
+        [SerializeField] private float fuerzaFrenado = 5f;
         [SerializeField] private float umbralParadaTotal = 0.1f;
 
-        // Variable para saber si estamos tocando el suelo
         private bool tocandoSuperficie = false;
+        private float timerArrastre = 0f; // Cronómetro para las ondas de arrastre
 
         private void Awake()
         {
@@ -29,7 +35,7 @@ namespace Telekinesis
         public void ApplyForce(Vector3 direction, float force)
         {
             rb.isKinematic = false;
-            tocandoSuperficie = false; // Al lanzarlo, vuela, no toca el suelo
+            tocandoSuperficie = false;
             rb.AddForce(direction.normalized * force, ForceMode.Impulse);
             Debug.Log($"[Telekinesis] Fuerza aplicada a {gameObject.name} | Dirección: {direction}");
         }
@@ -38,22 +44,15 @@ namespace Telekinesis
 
         private void FixedUpdate()
         {
-            // Solo aplicamos fricción si está tocando algo y no está siendo agarrado
             if (tocandoSuperficie && !rb.isKinematic)
             {
-                // Extraemos solo la velocidad horizontal (X, Z). Dejamos la Y en paz para que caiga bien.
                 Vector3 velocidadHorizontal = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
 
-                // 1. Frenado progresivo (deslizamiento controlado)
                 velocidadHorizontal = Vector3.Lerp(velocidadHorizontal, Vector3.zero, Time.fixedDeltaTime * fuerzaFrenado);
-
-                // 2. Freno progresivo de la rotación (para que deje de rodar)
                 rb.angularVelocity = Vector3.Lerp(rb.angularVelocity, Vector3.zero, Time.fixedDeltaTime * fuerzaFrenado);
 
-                // Reaplicamos la velocidad modificada
                 rb.linearVelocity = new Vector3(velocidadHorizontal.x, rb.linearVelocity.y, velocidadHorizontal.z);
 
-                // 3. Parada en seco (cuando ya casi no se mueve, lo forzamos a 0)
                 if (velocidadHorizontal.magnitude < umbralParadaTotal)
                 {
                     rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
@@ -62,42 +61,68 @@ namespace Telekinesis
             }
         }
 
-        // -------------------------------------------------- Físicas de Impacto y Suelo
+        // -------------------------------------------------- Físicas de Impacto, Suelo y Arrastre
 
         private void OnCollisionEnter(Collision collision)
         {
-            tocandoSuperficie = true; // Acabamos de tocar el suelo/pared
+            tocandoSuperficie = true;
 
             float velocidadImpacto = collision.relativeVelocity.magnitude;
 
             if (velocidadImpacto >= umbralImpacto)
             {
                 Vector3 puntoDeImpacto = collision.contacts[0].point;
-                GenerarOndaDeSonido(velocidadImpacto, puntoDeImpacto);
+                // Onda grande por el golpe inicial (usamos el multiplicador normal)
+                GenerarOndaDeSonido(velocidadImpacto, puntoDeImpacto, multiplicadorRuido);
             }
         }
 
-        // Mientras siga tocando, mantenemos la variable en true
         private void OnCollisionStay(Collision collision)
         {
             tocandoSuperficie = true;
+
+            // Medimos la velocidad a la que se está deslizando por el suelo
+            float velocidadActual = rb.linearVelocity.magnitude;
+
+            if (velocidadActual >= umbralArrastre)
+            {
+                // Sumamos tiempo al cronómetro
+                timerArrastre += Time.deltaTime;
+
+                if (timerArrastre >= intervaloRuidoArrastre)
+                {
+                    timerArrastre = 0f; // Reseteamos cronómetro
+                    Vector3 puntoDeFriccion = collision.contacts[0].point;
+
+                    // Onda pequeña por el arrastre (usamos el multiplicador de arrastre)
+                    GenerarOndaDeSonido(velocidadActual, puntoDeFriccion, multiplicadorRuidoArrastre);
+                }
+            }
+            else
+            {
+                // Si va muy lento, detenemos el cronómetro
+                timerArrastre = 0f;
+            }
         }
 
-        // Si rebota o lo lanzamos, ya no toca la superficie
         private void OnCollisionExit(Collision collision)
         {
             tocandoSuperficie = false;
+            timerArrastre = 0f; // Si salta por los aires, cancelamos el arrastre
         }
 
-        private void GenerarOndaDeSonido(float velocidad, Vector3 puntoDeImpacto)
+        // -------------------------------------------------- Generador de Onda
+
+        // Le he añadido el parámetro 'multiplicador' para diferenciar entre golpe y arrastre
+        private void GenerarOndaDeSonido(float velocidad, Vector3 origen, float multiplicador)
         {
             float fuerzaGolpe = rb.mass * velocidad;
-            float radioCalculado = fuerzaGolpe * multiplicadorRuido;
+            float radioCalculado = fuerzaGolpe * multiplicador;
             float radioFinal = Mathf.Clamp(radioCalculado, 0f, radioMaximoSonido);
 
             // --- 1. ALERTA VISUAL ---
             GameObject ondaVisual = new GameObject("OndaSonidoVisual");
-            ondaVisual.transform.position = new Vector3(puntoDeImpacto.x, puntoDeImpacto.y + 0.1f, puntoDeImpacto.z);
+            ondaVisual.transform.position = new Vector3(origen.x, origen.y + 0.1f, origen.z);
 
             EfectoOnda efecto = ondaVisual.AddComponent<EfectoOnda>();
             Color grisOscuro = new Color(0.2f, 0.2f, 0.2f, 0.8f);
@@ -107,10 +132,10 @@ namespace Telekinesis
             MovimientoRutaPatrullero[] enemigos = FindObjectsByType<MovimientoRutaPatrullero>(FindObjectsSortMode.None);
             foreach (MovimientoRutaPatrullero enemigo in enemigos)
             {
-                float distanciaAlRuido = Vector3.Distance(puntoDeImpacto, enemigo.transform.position);
+                float distanciaAlRuido = Vector3.Distance(origen, enemigo.transform.position);
                 if (distanciaAlRuido <= radioFinal)
                 {
-                    enemigo.ReportarInteraccion(puntoDeImpacto);
+                    enemigo.ReportarInteraccion(origen);
                 }
             }
         }

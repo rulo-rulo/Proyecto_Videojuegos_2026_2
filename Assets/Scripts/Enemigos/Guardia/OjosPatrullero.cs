@@ -1,4 +1,5 @@
 using UnityEngine;
+using Telekinesis;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class OjosPatrullero : MonoBehaviour
@@ -11,8 +12,17 @@ public class OjosPatrullero : MonoBehaviour
     public Color colorNormal = new Color(0, 1, 0, 0.3f);
     public Color colorAlerta = new Color(1, 0, 0, 0.5f);
 
+    [Header("Detección Visual de Objetos")]
+    [Tooltip("El cerebro del guardia. Se asigna solo automáticamente.")]
+    public MovimientoRutaPatrullero cerebro;
+    [Tooltip("A qué velocidad debe moverse la caja para llamar su atención (evita que vea cajas quietas).")]
+    public float velocidadMinimaDeteccion = 1f;
+
     public bool viendoAlJugador = false;
     private Mesh mesh;
+
+    // Evita que el guardia colapse enviando 60 avisos por segundo
+    private float cooldownVisual = 0f;
 
     void Start()
     {
@@ -23,15 +33,82 @@ public class OjosPatrullero : MonoBehaviour
         materialCono = mr.material;
         materialCono.color = colorNormal;
         materialCono.renderQueue = 2450;
+
+        if (cerebro == null)
+            cerebro = GetComponentInParent<MovimientoRutaPatrullero>();
     }
 
     void Update()
     {
         viendoAlJugador = false;
+
+        if (cooldownVisual > 0) cooldownVisual -= Time.deltaTime;
+
+        // 1. Ejecutamos el cerebro real (Detección en Volumen 3D)
+        DetectarJugadorYObjetos();
+
+        // 2. Dibujamos el cono de luz en el suelo (Puro efecto visual)
         DibujarCono();
+
         materialCono.color = viendoAlJugador ? colorAlerta : colorNormal;
     }
 
+    // --------------------------------------------------------
+    // SISTEMA DE DETECCIÓN INTELIGENTE
+    // --------------------------------------------------------
+    void DetectarJugadorYObjetos()
+    {
+        // Cogemos TODO lo que esté dentro de una esfera alrededor del guardia
+        Collider[] cosasCercanas = Physics.OverlapSphere(transform.position, rangoVision);
+
+        foreach (Collider cosa in cosasCercanas)
+        {
+            // Trazamos una línea imaginaria desde el ojo hasta el objeto
+            Vector3 direccionHaciaCosa = (cosa.transform.position - transform.position).normalized;
+
+            // Verificamos si el objeto está dentro del ángulo de su campo de visión
+            if (Vector3.Angle(transform.forward, direccionHaciaCosa) <= anguloVision / 2f)
+            {
+                // A) DETECCIÓN DEL JUGADOR
+                if (cosa.CompareTag("Player"))
+                {
+                    // Raycast para asegurar que no hay una pared tapando al jugador
+                    if (Physics.Raycast(transform.position, direccionHaciaCosa, out RaycastHit hit, rangoVision))
+                    {
+                        if (hit.collider.CompareTag("Player"))
+                        {
+                            viendoAlJugador = true;
+                        }
+                    }
+                }
+                // B) DETECCIÓN DE OBJETOS VOLADORES (Cajas de Telequinesis)
+                else if (cooldownVisual <= 0f && cosa.GetComponentInParent<MovableObject>() != null)
+                {
+                    Rigidbody rb = cosa.GetComponentInParent<Rigidbody>();
+
+                    // ¿Se está moviendo rápido?
+                    if (rb != null && rb.linearVelocity.magnitude >= velocidadMinimaDeteccion)
+                    {
+                        // Raycast para asegurar que la caja no está detrás de un muro de cristal/pared
+                        if (Physics.Raycast(transform.position, direccionHaciaCosa, out RaycastHit hitCaja, rangoVision))
+                        {
+                            // Si el rayo choca directamente contra la caja que vimos...
+                            if (hitCaja.collider == cosa)
+                            {
+                                cerebro.ReportarInteraccion(cosa.transform.position);
+                                cooldownVisual = 1f; // Pausamos la detección 1 segundo para no spamear
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // --------------------------------------------------------
+    // SISTEMA VISUAL DEL CONO (Malla Verde)
+    // --------------------------------------------------------
     void DibujarCono()
     {
         int vertexCount = resolucion + 1;
@@ -53,13 +130,10 @@ public class OjosPatrullero : MonoBehaviour
 
             int mask = ~LayerMask.GetMask("Llave");
 
+            // Solo usamos el raycast aquí para que la malla verde choque contra las paredes y no las atraviese
             if (Physics.Raycast(ray, out hit, rangoVision, mask))
             {
                 distance = hit.distance;
-                if (hit.collider.CompareTag("Player"))
-                {
-                    viendoAlJugador = true;
-                }
             }
 
             vertices[i + 1] = transform.InverseTransformPoint(transform.position + dir * distance);
