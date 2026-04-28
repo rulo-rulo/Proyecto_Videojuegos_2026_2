@@ -11,7 +11,7 @@ namespace Telekinesis
 
         [Header("Fuerza")]
         [Tooltip("Fuerza aplicada al objeto al confirmar")]
-        public float pushForce = 10f;
+        public float pushForce = 25f;
 
         [Header("Cámara")]
         [Tooltip("Velocidad a la que la cámara se desplaza al objeto")]

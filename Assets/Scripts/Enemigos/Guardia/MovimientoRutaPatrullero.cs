@@ -14,19 +14,16 @@ public class MovimientoRutaPatrullero : MonoBehaviour
     [Header("Ruta de Patrulla")]
     public Transform puntoA;
     public Transform puntoB;
-    public float velocidadPatrulla = 3f;
+    public float velocidadPatrulla = 2f;
     public float tiempoDeEspera = 1.5f;
-    public float velocidadGiro = 5f;
+    public float velocidadGiro = 3f;
 
-    [Header("Persecución y Derrota")]
-    public float velocidadPersecucion = 5f;
-    public float tiempoDeteccion = 1.5f;
-    public GameObject derrotaPanel;
-    public MonoBehaviour movimientoJugador;
+    [Header("Persecución")]
+    public float velocidadPersecucion = 3f;
+    public float tiempoDeteccion = 5f;
 
-    [Header("Investigación por telequinesis")]
-    public float radioAlerta = 6f;
-    public float tiempoInvestigacion = 1.5f;
+    [Header("Investigación por Ruido")]
+    public float tiempoInvestigacion = 2.5f;
 
     private Transform destinoActual;
     private bool estaCambiandoDePunto = false;
@@ -39,8 +36,6 @@ public class MovimientoRutaPatrullero : MonoBehaviour
 
     private Vector3 puntoAlerta;
     private bool enBusqueda = false;
-
-    private bool ignorarJugadorPorObjeto = false;
 
     void OnEnable()
     {
@@ -55,28 +50,32 @@ public class MovimientoRutaPatrullero : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+
+        // MUY IMPORTANTE: Evita que el enemigo se caiga de cara si le lanzas una caja fuerte
+        rb.freezeRotation = true;
+
         destinoActual = puntoB;
 
-        rb.useGravity = false;
-        rb.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
-
         if (ojos == null)
-            ojos = GetComponentInChildren<OjosPatrullero>();
+            ojos = GetComponent<OjosPatrullero>();
     }
 
     void Update()
     {
-        if (derrotaActivada) return;
+        if (derrotaActivada)
+        {
+            DetenerMovimientoHorizontal();
+            return;
+        }
 
-        // SI ESTÁ EN BÚSQUEDA POR ALERTA, NO DEJES QUE LOS OJOS LO DEVUELVAN A PATRULLA
         if (enBusqueda)
         {
             estadoActual = Estado.Persiguiendo;
         }
         else
         {
-            // Lógica de visión y tiempo
-            if (!ignorarJugadorPorObjeto && ojos != null && ojos.viendoAlJugador)
+            // Lógica de visión
+            if (ojos != null && ojos.viendoAlJugador)
             {
                 estadoActual = Estado.Persiguiendo;
                 estaCambiandoDePunto = false;
@@ -87,40 +86,27 @@ public class MovimientoRutaPatrullero : MonoBehaviour
                     rutinaInvestigacionActual = null;
                 }
 
-                // Acumulamos tiempo mientras te ve
                 timerDeteccion += Time.deltaTime;
 
-                // Avisamos al círculo/barra del HUD
                 if (DetectionHUD.Instance != null)
-                {
                     DetectionHUD.Instance.ReportTimer(this, tiempoDeteccion - timerDeteccion);
-                }
 
-                // Ya no mata al jugador
                 if (timerDeteccion >= tiempoDeteccion)
-                {
                     timerDeteccion = 0f;
-                }
             }
             else
             {
-                // Si nos pierde de vista, vuelve a patrullar y resetea el contador
                 if (estadoActual == Estado.Persiguiendo)
-                {
                     estadoActual = Estado.Patrullando;
-                }
 
                 timerDeteccion = 0f;
 
-                // Borramos el círculo/barra del HUD
                 if (DetectionHUD.Instance != null)
-                {
                     DetectionHUD.Instance.RemoveTimer(this);
-                }
             }
         }
 
-        // Lógica de movimiento
+        // Lógica de estados
         switch (estadoActual)
         {
             case Estado.Patrullando:
@@ -128,7 +114,7 @@ public class MovimientoRutaPatrullero : MonoBehaviour
                 break;
 
             case Estado.Investigando:
-                // El movimiento de investigación lo controla la coroutine
+                // Se maneja en la Coroutine
                 break;
 
             case Estado.Persiguiendo:
@@ -136,9 +122,31 @@ public class MovimientoRutaPatrullero : MonoBehaviour
                 break;
 
             case Estado.EsperandoYGirando:
+                DetenerMovimientoHorizontal();
                 break;
         }
     }
+
+    // -------------------------------------------------- NUEVO SISTEMA DE MOVIMIENTO
+
+    private void AplicarVelocidadHacia(Vector3 destino, float velocidad)
+    {
+        Vector3 posPlana = new Vector3(rb.position.x, 0, rb.position.z);
+        Vector3 destinoPlano = new Vector3(destino.x, 0, destino.z);
+
+        Vector3 direccion = (destinoPlano - posPlana).normalized;
+
+        // Mantenemos la velocidad Y intacta para que la gravedad funcione perfectamente
+        // Nota: Si usas Unity 6, puedes cambiar 'velocity' por 'linearVelocity'
+        rb.linearVelocity = new Vector3(direccion.x * velocidad, rb.linearVelocity.y, direccion.z * velocidad);
+    }
+
+    private void DetenerMovimientoHorizontal()
+    {
+        rb.linearVelocity = new Vector3(0, rb.linearVelocity.y, 0);
+    }
+
+    // -------------------------------------------------- LÓGICA DE ESTADOS
 
     void MoverHaciaDestino()
     {
@@ -147,20 +155,14 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         Vector3 posPlana = new Vector3(rb.position.x, 0, rb.position.z);
         Vector3 destinoPlano = new Vector3(destinoActual.position.x, 0, destinoActual.position.z);
 
-        if (Vector3.Distance(posPlana, destinoPlano) > 0.05f)
+        if (Vector3.Distance(posPlana, destinoPlano) > 0.1f)
         {
-            Vector3 nuevaPos = Vector3.MoveTowards(
-                rb.position,
-                new Vector3(destinoPlano.x, rb.position.y, destinoPlano.z),
-                velocidadPatrulla * Time.deltaTime
-            );
-
-            rb.MovePosition(nuevaPos);
+            AplicarVelocidadHacia(destinoPlano, velocidadPatrulla);
             GirarHacia(destinoPlano);
         }
         else if (!estaCambiandoDePunto)
         {
-            rb.MovePosition(new Vector3(destinoPlano.x, rb.position.y, destinoPlano.z));
+            DetenerMovimientoHorizontal();
             StartCoroutine(SecuenciaCambioDePunto());
         }
     }
@@ -195,34 +197,17 @@ public class MovimientoRutaPatrullero : MonoBehaviour
 
     void PerseguirJugador()
     {
-        Vector3 destino;
+        Vector3 destino = enBusqueda ? puntoAlerta : jugador.position;
+        Vector3 posPlana = new Vector3(rb.position.x, 0, rb.position.z);
+        Vector3 destinoPlano = new Vector3(destino.x, 0, destino.z);
 
-        if (enBusqueda)
-        {
-            destino = new Vector3(puntoAlerta.x, rb.position.y, puntoAlerta.z);
-        }
-        else
-        {
-            destino = new Vector3(jugador.position.x, rb.position.y, jugador.position.z);
-        }
-
-        Vector3 nuevaPos = Vector3.MoveTowards(
-            rb.position,
-            destino,
-            velocidadPersecucion * Time.deltaTime
-        );
-
-        nuevaPos.y = rb.position.y;
-
-        rb.MovePosition(nuevaPos);
+        AplicarVelocidadHacia(destino, velocidadPersecucion);
         GirarHacia(destino);
 
-        // Si llega al punto de alerta, deja de buscar
-        if (enBusqueda && Vector3.Distance(rb.position, destino) < 0.2f)
+        if (enBusqueda && Vector3.Distance(posPlana, destinoPlano) < 0.3f)
         {
             enBusqueda = false;
             estadoActual = Estado.Patrullando;
-
             Debug.Log(gameObject.name + " llegó al último punto de detección.");
         }
     }
@@ -238,95 +223,40 @@ public class MovimientoRutaPatrullero : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, rotacion, velocidadGiro * Time.deltaTime);
         }
     }
-    public void ReportarInteraccion(Transform objetoInteraccion)
+
+    public void ReportarInteraccion(Vector3 posicionInteraccion)
     {
-        if (derrotaActivada) return;
-        if (objetoInteraccion == null) return;
+        if (derrotaActivada || estadoActual == Estado.Persiguiendo) return;
 
-        if (ojos == null)
-            ojos = GetComponentInChildren<OjosPatrullero>();
+        Debug.Log($"[{gameObject.name}] Escuchó o vio un objeto. Yendo a investigar...");
 
-        if (ojos == null)
-        {
-            Debug.LogWarning(gameObject.name + " no tiene OjosPatrullero.");
-            return;
-        }
+        if (rutinaInvestigacionActual != null) StopCoroutine(rutinaInvestigacionActual);
 
-        if (!ojos.PuedeVerObjeto(objetoInteraccion))
-        {
-            Debug.Log(gameObject.name + " no ve el objeto movido.");
-            return;
-        }
-
-        Debug.Log(gameObject.name + " ve el objeto movido y va a investigar.");
-
-        Vector3 posicionInteraccion = objetoInteraccion.position;
-
-        if (rutinaInvestigacionActual != null)
-            StopCoroutine(rutinaInvestigacionActual);
-
-        StopAllCoroutines();
-
-        enBusqueda = false;
         estaCambiandoDePunto = false;
-        ignorarJugadorPorObjeto = true;
-
         rutinaInvestigacionActual = StartCoroutine(IrAInvestigar(posicionInteraccion));
     }
 
     IEnumerator IrAInvestigar(Vector3 punto)
     {
         estadoActual = Estado.Investigando;
+        Vector3 puntoPlano = new Vector3(punto.x, 0, punto.z);
 
-        Vector3 puntoPlano = new Vector3(punto.x, rb.position.y, punto.z);
-
-        Vector3 direccionDesdeEnemigo = (puntoPlano - rb.position).normalized;
-        Vector3 puntoSeguro = puntoPlano - direccionDesdeEnemigo * 1.2f;
-        puntoSeguro.y = rb.position.y;
-
-        float tiempoMaximoParaLlegar = 3f;
-        float tiempoActual = 0f;
-
-        while (
-            Vector3.Distance(
-                new Vector3(rb.position.x, 0, rb.position.z),
-                new Vector3(puntoSeguro.x, 0, puntoSeguro.z)
-            ) > 0.3f
-            && tiempoActual < tiempoMaximoParaLlegar
-        )
+        // Caminar
+        while (Vector3.Distance(new Vector3(rb.position.x, 0, rb.position.z), puntoPlano) > 0.3f)
         {
-            tiempoActual += Time.deltaTime;
-
-            Vector3 destinoPlano = new Vector3(puntoSeguro.x, rb.position.y, puntoSeguro.z);
-
-            Vector3 nuevaPos = Vector3.MoveTowards(
-                rb.position,
-                destinoPlano,
-                velocidadPatrulla * Time.deltaTime
-            );
-
-            nuevaPos.y = rb.position.y;
-
-            rb.MovePosition(nuevaPos);
-            GirarHacia(destinoPlano);
-
-            yield return null;
+            AplicarVelocidadHacia(punto, velocidadPatrulla);
+            GirarHacia(punto);
+            yield return null; // Esperamos al siguiente frame
         }
 
+        // Al llegar, se detiene y espera
+        DetenerMovimientoHorizontal();
+        Debug.Log($"[{gameObject.name}] Llegó al origen. Investigando...");
         yield return new WaitForSeconds(tiempoInvestigacion);
 
+        Debug.Log($"[{gameObject.name}] Falsa alarma. Volviendo a patrullar.");
         rutinaInvestigacionActual = null;
-        enBusqueda = false;
         estadoActual = Estado.Patrullando;
-        estaCambiandoDePunto = false;
-        ignorarJugadorPorObjeto = false;
-
-        float distanciaA = Vector3.Distance(transform.position, puntoA.position);
-        float distanciaB = Vector3.Distance(transform.position, puntoB.position);
-
-        destinoActual = distanciaA < distanciaB ? puntoA : puntoB;
-
-        Debug.Log(gameObject.name + " termina investigación y vuelve a patrullar.");
     }
 
     void RecibirAlerta(Vector3 punto)
@@ -341,29 +271,5 @@ public class MovimientoRutaPatrullero : MonoBehaviour
             StopCoroutine(rutinaInvestigacionActual);
             rutinaInvestigacionActual = null;
         }
-
-        Debug.Log(gameObject.name + " recibió alerta y cambia a estado de búsqueda.");
     }
-
-    // DESACTIVADO PARA SPRINT 3
-    /*
-    void ActivarDerrota()
-    {
-        derrotaActivada = true;
-
-        if (DetectionHUD.Instance != null)
-            DetectionHUD.Instance.RemoveTimer(this);
-
-        if (GameManager.Instance != null)
-            GameManager.Instance.FinalizarDerrota();
-
-        if (derrotaPanel != null)
-            derrotaPanel.SetActive(true);
-
-        if (movimientoJugador != null)
-            movimientoJugador.enabled = false;
-
-        Time.timeScale = 0f; // Pausa el juego
-    }
-    */
 }
