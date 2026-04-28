@@ -4,23 +4,19 @@ using TMPro;
 
 public class HabilidadCooldown : MonoBehaviour
 {
-    [Header("Referencias (Sombra de Recarga)")]
-    public Dash scriptDash;
+    [Header("Referencias")]
+    public Dash scriptDash; // Referencia corregida a la clase 'Dash'
     public Image imagenSombra;
     public TextMeshProUGUI textoContador;
 
     [Header("Ajustes de Input")]
-    // 1. Aquí definimos el Left Shift
     public KeyCode teclaTeclado = KeyCode.LeftShift;
-
-    // 2. Aquí definimos el nombre del Eje para el L2 / LT
-    [Tooltip("Debe llamarse igual que en el Input Manager de Unity")]
     public string ejeGatilloMando = "GatilloIzquierdo";
 
     [Header("Ajustes de Tiempo")]
     public float tiempoEnfriamiento = 5f;
 
-    [Header("Colores")]
+    [Header("Colores de Icono")]
     public Color colorNormal = Color.white;
     public Color colorActivo = new Color(0.4f, 0.4f, 0.4f, 1f);
 
@@ -44,39 +40,43 @@ public class HabilidadCooldown : MonoBehaviour
         }
         else
         {
-            // DETECCIÓN DE LEFT SHIFT
-            bool pulsoTeclado = Input.GetKeyDown(teclaTeclado);
-
-            // DETECCIÓN DE L2 / LT (Gatillo)
-            bool pulsoMando = false;
-            float valorGatillo = Input.GetAxisRaw(ejeGatilloMando);
-
-            if (valorGatillo > 0.5f && !gatilloYaPulsado)
+            if (DetectarInput())
             {
-                pulsoMando = true;
-                gatilloYaPulsado = true;
-            }
-            else if (valorGatillo <= 0.1f)
-            {
-                gatilloYaPulsado = false;
-            }
-
-            // SI PULSAS CUALQUIERA DE LOS DOS, HACE EL DASH
-            if (pulsoTeclado || pulsoMando)
-            {
-                if (scriptDash != null && scriptDash.ExecuteDash())
+                // Si este cooldown es para el DASH
+                if (scriptDash != null)
                 {
-                    IniciarCooldown();
+                    scriptDash.ExecuteDash(); // Ejecutamos la acción
+                    IniciarCooldown();        // Iniciamos el enfriamiento
                 }
             }
         }
+    }
+
+    private bool DetectarInput()
+    {
+        // Teclado
+        if (Input.GetKeyDown(teclaTeclado)) return true;
+
+        // Mando (L2/LT)
+        float valorGatillo = Input.GetAxisRaw(ejeGatilloMando);
+        if (valorGatillo > 0.5f && !gatilloYaPulsado)
+        {
+            gatilloYaPulsado = true;
+            return true;
+        }
+        else if (valorGatillo <= 0.1f)
+        {
+            gatilloYaPulsado = false;
+        }
+
+        return false;
     }
 
     public void IniciarCooldown()
     {
         estaEnEnfriamiento = true;
         timer = tiempoEnfriamiento;
-        EstablecerUsoActivo(false);
+        if (imagenBase != null) imagenBase.color = colorActivo;
     }
 
     void ActualizarCooldown()
@@ -88,6 +88,7 @@ public class HabilidadCooldown : MonoBehaviour
             estaEnEnfriamiento = false;
             if (imagenSombra != null) imagenSombra.fillAmount = 0;
             if (textoContador != null) textoContador.text = "";
+            if (imagenBase != null) imagenBase.color = colorNormal;
         }
         else
         {
@@ -96,8 +97,14 @@ public class HabilidadCooldown : MonoBehaviour
         }
     }
 
+    // Añade esto dentro de la clase HabilidadCooldown
     public void EstablecerUsoActivo(bool enUso)
     {
-        if (imagenBase != null) imagenBase.color = enUso ? colorActivo : colorNormal;
+        // Si la habilidad no está en enfriamiento, cambiamos el color
+        // para indicar que está seleccionada o en uso.
+        if (!estaEnEnfriamiento && imagenBase != null)
+        {
+            imagenBase.color = enUso ? colorActivo : colorNormal;
+        }
     }
 }

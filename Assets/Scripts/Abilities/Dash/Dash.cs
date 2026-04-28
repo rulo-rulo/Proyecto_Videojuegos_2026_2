@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class Dash : MonoBehaviour
 {
@@ -16,57 +17,56 @@ public class Dash : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         controller = GetComponent<CharacterController>();
 
-        // Configuración para que no se mueva solo
-        rb.useGravity = false;
-        rb.isKinematic = true;
-        rb.freezeRotation = true;
-        rb.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePosition;
+        // Configuración para evitar tirones y saltos de colisión
+        if (rb != null)
+        {
+            rb.useGravity = false;
+            rb.isKinematic = true;
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
+            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+            rb.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePosition;
+        }
     }
 
-    // Método PÚBLICO para que lo llame el script de Cooldown
-    public bool ExecuteDash()
+    // Método PÚBLICO que activa la corrutina
+    public void ExecuteDash()
     {
-        if (!AbilityManager.Instance.CanUseAbility(this)) return false;
+        StartCoroutine(DashRoutine());
+    }
 
-        AbilityManager.Instance.RegisterAbility(this);
-
+    private IEnumerator DashRoutine()
+    {
+        // 1. Apagamos el controlador para que la física mande
         if (controller != null) controller.enabled = false;
+        yield return null;
 
+        // 2. Liberamos el Rigidbody
         rb.isKinematic = false;
         rb.constraints = RigidbodyConstraints.FreezeRotation;
+        rb.linearVelocity = Vector3.zero;
 
+        // 3. Aplicamos fuerza
         Vector3 direction = GetDirection();
         rb.AddForce(direction * dashForce, ForceMode.Impulse);
 
-        Invoke(nameof(ResetDash), dashDuration);
+        // 4. Duración del impulso
+        yield return new WaitForSeconds(dashDuration);
 
-        return true;
-    }
-
-    private void ResetDash()
-    {
+        // 5. Frenado y re-congelación
         rb.linearVelocity = Vector3.zero;
         rb.isKinematic = true;
         rb.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePosition;
 
-        if (controller != null) controller.enabled = true;
+        // 6. Sincronización final
+        yield return new WaitForFixedUpdate();
 
-        AbilityManager.Instance.ClearAbility(this);
+        if (controller != null) controller.enabled = true;
     }
 
     private Vector3 GetDirection()
     {
-        // 1. Leemos el teclado por defecto
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
-
-        // 2. Leemos también los ejes del joystick que usas en tu movimiento
-        h += Input.GetAxisRaw("MandoHorizontal");
-        v += Input.GetAxisRaw("MandoVertical");
-
-        // 3. Clampeamos para que, si pulsas teclado y mando a la vez, no corra el doble
-        h = Mathf.Clamp(h, -1f, 1f);
-        v = Mathf.Clamp(v, -1f, 1f);
 
         Vector3 forward = playerCam.forward;
         Vector3 right = playerCam.right;
@@ -75,10 +75,7 @@ public class Dash : MonoBehaviour
         forward.Normalize();
         right.Normalize();
 
-        // 4. Si después de comprobar teclado Y mando no hay movimiento, dash hacia adelante
         if (h == 0 && v == 0) return forward;
-
-        // 5. Si hay movimiento, calculamos la diagonal correcta
         return (forward * v + right * h).normalized;
     }
 }
