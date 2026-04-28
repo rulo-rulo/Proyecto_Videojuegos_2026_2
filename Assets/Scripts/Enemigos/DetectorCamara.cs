@@ -47,12 +47,13 @@ public class DetectorCamara : MonoBehaviour
 
     void LateUpdate()
     {
-        jugadorEncontrado = false;
+        jugadorEncontrado = PuedeVerJugador();
+
         GenerarConoYDetectar(ref jugadorEncontrado);
 
         if (jugadorEncontrado)
         {
-            materialCono.color = colorAlerta;
+            materialCono.SetColor("_Color", colorAlerta);
             timerDeteccion += Time.deltaTime;
             ultimoPuntoDeteccion = jugador.position;
 
@@ -68,7 +69,7 @@ public class DetectorCamara : MonoBehaviour
         }
         else
         {
-            materialCono.color = colorNormal;
+            materialCono.SetColor("_Color", colorNormal);
             timerDeteccion = 0f;
             alertaActivada = false;
 
@@ -77,60 +78,81 @@ public class DetectorCamara : MonoBehaviour
         }
     }
 
-    void GenerarConoYDetectar(ref bool hayContacto)
+    bool PuedeVerJugador()
     {
-        List<Vector3> vertices = new List<Vector3>();
-        vertices.Add(Vector3.zero);
-
-        for (int y = 0; y <= resolucion; y++)
+        if (jugador == null)
         {
-            float tY = (float)y / resolucion;
-            float angY = Mathf.Lerp(-aperturaVertical / 2, aperturaVertical / 2, tY);
-
-            for (int x = 0; x <= resolucion; x++)
-            {
-                float tX = (float)x / resolucion;
-                float angX = Mathf.Lerp(-aperturaHorizontal / 2, aperturaHorizontal / 2, tX);
-
-                Vector3 dirLocal = Quaternion.Euler(angY, angX, 0) * Vector3.forward;
-                Vector3 dirGlobal = transform.TransformDirection(dirLocal);
-
-                float distanciaFinal = rangoVision;
-
-                RaycastHit hit;
-                if (Physics.Raycast(transform.position, dirGlobal, out hit, rangoVision))
-                {
-                    distanciaFinal = hit.distance;
-
-                    if (hit.collider.CompareTag(tagJugador))
-                        hayContacto = true;
-                }
-
-                vertices.Add(transform.InverseTransformPoint(transform.position + dirGlobal * distanciaFinal));
-            }
+            Debug.LogWarning("No hay jugador asignado en DetectorCamara");
+            return false;
         }
 
-        List<int> tri = new List<int>();
-        int vFila = resolucion + 1;
+        // Convertimos la posición del jugador a coordenadas locales de la cámara
+        Vector3 jugadorLocal = transform.InverseTransformPoint(jugador.position);
 
-        for (int y = 0; y < resolucion; y++)
+        // Si está detrás de la cámara, no cuenta
+        if (jugadorLocal.z < 0)
+            return false;
+
+        // Comprobamos distancia
+        float distancia = new Vector2(jugadorLocal.x, jugadorLocal.z).magnitude;
+
+        if (distancia > rangoVision)
+            return false;
+
+        // Comprobamos si está dentro del ángulo horizontal del cono
+        float angulo = Mathf.Atan2(jugadorLocal.x, jugadorLocal.z) * Mathf.Rad2Deg;
+
+        if (Mathf.Abs(angulo) > aperturaHorizontal / 2f)
+            return false;
+
+        return true;
+    }
+
+
+    void GenerarConoYDetectar(ref bool hayContacto)
+    {
+        int pasos = resolucion;
+        float anguloPaso = aperturaHorizontal / pasos;
+
+        List<Vector3> vertices = new List<Vector3>();
+        List<int> triangulos = new List<int>();
+
+        vertices.Add(Vector3.zero);
+
+        float anguloActual = -aperturaHorizontal / 2;
+
+        for (int i = 0; i <= pasos; i++)
         {
-            for (int x = 0; x < resolucion; x++)
-            {
-                int i = y * vFila + x + 1;
-                tri.Add(i); tri.Add(i + 1); tri.Add(i + vFila);
-                tri.Add(i + vFila); tri.Add(i + 1); tri.Add(i + vFila + 1);
+            float rad = anguloActual * Mathf.Deg2Rad;
 
-                if (y == 0) { tri.Add(0); tri.Add(i + 1); tri.Add(i); }
-                if (y == resolucion - 1) { tri.Add(0); tri.Add(i + vFila); tri.Add(i + vFila + 1); }
-                if (x == 0) { tri.Add(0); tri.Add(i); tri.Add(i + vFila); }
-                if (x == resolucion - 1) { tri.Add(0); tri.Add(i + vFila + 1); tri.Add(i + 1); }
+            Vector3 dir = new Vector3(Mathf.Sin(rad), 0, Mathf.Cos(rad));
+            Vector3 dirGlobal = transform.TransformDirection(dir);
+
+            float distanciaFinal = rangoVision;
+
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, dirGlobal, out hit, rangoVision))
+            {
+                distanciaFinal = hit.distance;
+
+            
             }
+
+            vertices.Add(transform.InverseTransformPoint(transform.position + dirGlobal * distanciaFinal));
+
+            anguloActual += anguloPaso;
+        }
+
+        for (int i = 1; i < vertices.Count - 1; i++)
+        {
+            triangulos.Add(0);
+            triangulos.Add(i);
+            triangulos.Add(i + 1);
         }
 
         mesh.Clear();
         mesh.vertices = vertices.ToArray();
-        mesh.triangles = tri.ToArray();
+        mesh.triangles = triangulos.ToArray();
         mesh.RecalculateNormals();
     }
 
@@ -138,8 +160,10 @@ public class DetectorCamara : MonoBehaviour
     {
         if (jugador == null) return;
 
-        Vector3 direccion = jugador.position - transform.position;
-        direccion.y = 0f;
+        // Apunta un poco más abajo (ajusta este valor si quieres más o menos inclinación)
+        Vector3 objetivo = jugador.position + Vector3.down * 0.5f;
+
+        Vector3 direccion = objetivo - transform.position;
 
         if (direccion.sqrMagnitude < 0.001f) return;
 
