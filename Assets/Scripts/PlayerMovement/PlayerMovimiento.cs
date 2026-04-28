@@ -10,6 +10,10 @@ public class PlayerMovimiento : MonoBehaviour
     [Tooltip("Velocidad base del jugador. Ahora es igual a la antigua velocidad de correr.")]
     [SerializeField] private float velocidadMovimiento = 8f;
 
+    // NUEVO: Variable para controlar lo rápido que gira el personaje
+    [Tooltip("Velocidad a la que el personaje gira hacia la dirección de movimiento.")]
+    [SerializeField] private float velocidadRotacion = 10f;
+
     [Header("Gravedad")]
     [SerializeField] private float Gravedad = -9f;
     private Vector3 velocidadVertical;
@@ -19,13 +23,10 @@ public class PlayerMovimiento : MonoBehaviour
 
     }
 
-    // Necesitamos inicializar el CharacterController al inicializar el objeto
     private void Awake()
     {
-        // Obtener el componente CharacterController del GameObject
         controlador = GetComponent<CharacterController>();
 
-        // Si no se ha asignado una camara, usar la camara principal
         if (camara == null && Camera.main != null)
         {
             camara = Camera.main.transform;
@@ -39,57 +40,49 @@ public class PlayerMovimiento : MonoBehaviour
         AplicarGravedad();
     }
 
-    // Método para mover al jugador en el plano horizontal basado en la orientación de la cámara
     private void MoverJugadorEnPlano()
     {
         if (!controlador.enabled) return;
 
-        // ---------------------------------------
-        // Movimiento del personje (FLECHAS Y MANDO)
-        // ---------------------------------------
-
         float Horizontal = 0f;
         float Vertical = 0f;
 
-        // 1. Leemos exclusivamente las flechas del teclado
         if (Input.GetKey(KeyCode.RightArrow)) Horizontal += 1f;
         if (Input.GetKey(KeyCode.LeftArrow)) Horizontal -= 1f;
         if (Input.GetKey(KeyCode.UpArrow)) Vertical += 1f;
         if (Input.GetKey(KeyCode.DownArrow)) Vertical -= 1f;
 
-        // 2. Leemos EXCLUSIVAMENTE los nuevos ejes del mando
         Horizontal += Input.GetAxisRaw("MandoHorizontal");
         Vertical += Input.GetAxisRaw("MandoVertical");
 
-        // 3. Clampeamos los valores
         Horizontal = Mathf.Clamp(Horizontal, -1f, 1f);
         Vertical = Mathf.Clamp(Vertical, -1f, 1f);
 
-        // Obtener las direcciones adelante y derecha de la camara para el movimiento
         Vector3 adelanteCamara = camara.forward;
         Vector3 derechaCamara = camara.right;
 
-        // Eliminar la componente Y para que no afecte al movimiento horizontal. Queremos que mire pero no que pueda caminar hacia arriba o abajo
         adelanteCamara.y = 0f;
         derechaCamara.y = 0f;
 
-        // Hacemos que no haya ningun lado que se mueva mas que el otro. Se normalizan los vectores.
         adelanteCamara.Normalize();
         derechaCamara.Normalize();
 
-        // Vector de dirección basado en los inputs
         Vector3 direccionPlano = (derechaCamara * Horizontal + adelanteCamara * Vertical);
 
-        // Normalizamos el vector para que no se mueva mas rapido en diagonal.
+        // Si hay algún input de movimiento (sqrMagnitude mayor que casi cero)
         if (direccionPlano.sqrMagnitude > 0.0001f)
         {
+            // Normalizamos el vector para que no se mueva mas rapido en diagonal.
             direccionPlano.Normalize();
+
+            // NUEVO: Calculamos la rotación deseada mirando hacia la dirección del movimiento
+            Quaternion rotacionDeseada = Quaternion.LookRotation(direccionPlano);
+
+            // NUEVO: Giramos suavemente el personaje hacia esa rotación
+            transform.rotation = Quaternion.Slerp(transform.rotation, rotacionDeseada, velocidadRotacion * Time.deltaTime);
         }
 
-        // Movimiento del personaje usando CharacterController a la nueva velocidad
         Vector3 desplazamientoXZ = direccionPlano * (velocidadMovimiento * Time.deltaTime);
-
-        // Mover el CharacterController
         controlador.Move(desplazamientoXZ);
     }
 
