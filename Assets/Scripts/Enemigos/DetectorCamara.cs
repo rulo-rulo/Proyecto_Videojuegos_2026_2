@@ -54,6 +54,7 @@ public class DetectorCamara : MonoBehaviour
         if (jugadorEncontrado)
         {
             materialCono.SetColor("_Color", colorAlerta);
+
             timerDeteccion += Time.deltaTime;
             ultimoPuntoDeteccion = jugador.position;
 
@@ -70,6 +71,7 @@ public class DetectorCamara : MonoBehaviour
         else
         {
             materialCono.SetColor("_Color", colorNormal);
+
             timerDeteccion = 0f;
             alertaActivada = false;
 
