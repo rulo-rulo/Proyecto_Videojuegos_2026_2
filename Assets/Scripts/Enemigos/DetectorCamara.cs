@@ -49,12 +49,13 @@ public class DetectorCamara : MonoBehaviour
     {
         jugadorEncontrado = PuedeVerJugador();
 
-        GenerarConoYDetectar(ref jugadorEncontrado);
+        GenerarConoYDetectar();
+
+        // Fuerza siempre el color según si ve o no al jugador
+        materialCono.SetColor("_Color", jugadorEncontrado ? colorAlerta : colorNormal);
 
         if (jugadorEncontrado)
         {
-            materialCono.SetColor("_Color", colorAlerta);
-
             timerDeteccion += Time.deltaTime;
             ultimoPuntoDeteccion = jugador.position;
 
@@ -70,8 +71,6 @@ public class DetectorCamara : MonoBehaviour
         }
         else
         {
-            materialCono.SetColor("_Color", colorNormal);
-
             timerDeteccion = 0f;
             alertaActivada = false;
 
@@ -111,7 +110,7 @@ public class DetectorCamara : MonoBehaviour
     }
 
 
-    void GenerarConoYDetectar(ref bool hayContacto)
+    void GenerarConoYDetectar()
     {
         int pasos = resolucion;
         float anguloPaso = aperturaHorizontal / pasos;
