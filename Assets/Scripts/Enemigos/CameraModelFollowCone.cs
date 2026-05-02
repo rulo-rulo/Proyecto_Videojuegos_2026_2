@@ -11,7 +11,6 @@ public class CameraModelFollowCone : MonoBehaviour
 
         Vector3 coneEuler = visionCone.rotation.eulerAngles;
 
-        // Sadece sağ-sol dönüşü kopyala
         transform.rotation = Quaternion.Euler(
             transform.rotation.eulerAngles.x,
             coneEuler.y,
