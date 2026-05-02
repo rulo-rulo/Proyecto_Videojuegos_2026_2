@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -29,6 +30,8 @@ public class DetectorCamara : MonoBehaviour
     private bool alertaActivada = false;
     private bool jugadorEncontrado = false;
     private Vector3 ultimoPuntoDeteccion;
+    private float tiempoPerdida = 0.6f;
+    private float timerPerdida = 0f;
 
     public bool PlayerDetected => jugadorEncontrado;
     public float DetectionTimer => timerDeteccion;
@@ -47,11 +50,25 @@ public class DetectorCamara : MonoBehaviour
 
     void LateUpdate()
     {
-        jugadorEncontrado = PuedeVerJugador();
+        bool detectadoAhora = PuedeVerJugador();
+
+        if (detectadoAhora)
+        {
+            jugadorEncontrado = true;
+            timerPerdida = 0f;
+        }
+        else if (jugadorEncontrado)
+        {
+            timerPerdida += Time.deltaTime;
+
+            if (timerPerdida >= tiempoPerdida)
+            {
+                jugadorEncontrado = false;
+            }
+        }
 
         GenerarConoYDetectar();
 
-        // Fuerza siempre el color según si ve o no al jugador
         materialCono.SetColor("_Color", jugadorEncontrado ? colorAlerta : colorNormal);
 
         if (jugadorEncontrado)
