@@ -11461,8 +11461,57 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5231830388216471283, guid: 3629e803f50d7784c81830184637ba68, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1286062132}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6776729598720076172, guid: 3629e803f50d7784c81830184637ba68, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1762645608}
+    - targetCorrespondingSourceObject: {fileID: 2382847145885379313, guid: 3629e803f50d7784c81830184637ba68, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1762645607}
   m_SourcePrefab: {fileID: 100100000, guid: 3629e803f50d7784c81830184637ba68, type: 3}
+--- !u!4 &1762645604 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6463013555069496099, guid: 3629e803f50d7784c81830184637ba68, type: 3}
+  m_PrefabInstance: {fileID: 1762645603}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1762645605 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2382847145885379313, guid: 3629e803f50d7784c81830184637ba68, type: 3}
+  m_PrefabInstance: {fileID: 1762645603}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1762645606 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6776729598720076172, guid: 3629e803f50d7784c81830184637ba68, type: 3}
+  m_PrefabInstance: {fileID: 1762645603}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1762645607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1762645605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 685ed0969c4bbad4bae88263004c4bf9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  visionCone: {fileID: 1762645604}
+  rotationOffset: {x: 0, y: 0, z: 0}
+--- !u!114 &1762645608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1762645606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 685ed0969c4bbad4bae88263004c4bf9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  visionCone: {fileID: 1762645604}
+  rotationOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &1764713945
 GameObject:
   m_ObjectHideFlags: 0
