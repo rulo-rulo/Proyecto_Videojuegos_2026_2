@@ -24,6 +24,11 @@ public class DetectorCamara : MonoBehaviour
     public Color colorNormal = new Color(0, 1, 0, 0.3f);
     public Color colorAlerta = new Color(1, 0, 0, 0.5f);
 
+    [Header("Límite de seguimiento")]
+    public float maxAnguloSeguimiento = 45f;
+
+    private Quaternion rotacionInicial;
+
     private Mesh mesh;
     private Material materialCono;
     private float timerDeteccion = 0f;
@@ -36,11 +41,13 @@ public class DetectorCamara : MonoBehaviour
     public bool PlayerDetected => jugadorEncontrado;
     public float DetectionTimer => timerDeteccion;
 
+
     void Start()
     {
         mesh = new Mesh();
         mesh.name = "Malla_Detector_Camara";
         GetComponent<MeshFilter>().mesh = mesh;
+        rotacionInicial = transform.rotation;
 
         MeshRenderer mr = GetComponent<MeshRenderer>();
         mr.material = new Material(mr.material);
@@ -76,7 +83,7 @@ public class DetectorCamara : MonoBehaviour
             timerDeteccion += Time.deltaTime;
             ultimoPuntoDeteccion = jugador.position;
 
-            EnfocarJugador();
+           EnfocarJugador();
 
             if (DetectionHUD.Instance != null)
                 DetectionHUD.Instance.ReportTimer(this, tiempoDeteccion - timerDeteccion);
@@ -90,6 +97,12 @@ public class DetectorCamara : MonoBehaviour
         {
             timerDeteccion = 0f;
             alertaActivada = false;
+
+            transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            rotacionInicial,
+            2f * Time.deltaTime
+            );
 
             if (DetectionHUD.Instance != null)
                 DetectionHUD.Instance.RemoveTimer(this);
@@ -178,14 +191,24 @@ public class DetectorCamara : MonoBehaviour
     {
         if (jugador == null) return;
 
-        // Apunta un poco más abajo (ajusta este valor si quieres más o menos inclinación)
         Vector3 objetivo = jugador.position + Vector3.down * 0.5f;
-
         Vector3 direccion = objetivo - transform.position;
 
         if (direccion.sqrMagnitude < 0.001f) return;
 
         Quaternion rotacionObjetivo = Quaternion.LookRotation(direccion);
+
+        float diferenciaAngulo = Mathf.DeltaAngle(
+            rotacionInicial.eulerAngles.y,
+            rotacionObjetivo.eulerAngles.y
+        );
+
+        if (Mathf.Abs(diferenciaAngulo) > maxAnguloSeguimiento)
+        {
+            jugadorEncontrado = false;
+            return;
+        }
+
         transform.rotation = Quaternion.Slerp(
             transform.rotation,
             rotacionObjetivo,
