@@ -12,8 +12,11 @@ public class MovimientoRutaPatrullero : MonoBehaviour
     public Transform jugador;
 
     [Header("Ruta de Patrulla")]
-    public Transform puntoA;
-    public Transform puntoB;
+    [Tooltip("Añade aquí todos los puntos por los que pasará el enemigo.")]
+    public Transform[] puntosDePatrulla;
+    [Tooltip("Si se marca, elegirá el siguiente punto al azar. Si no, irá en orden.")]
+    public bool patrullaAleatoria = false;
+
     public float velocidadPatrulla = 2f;
     public float tiempoDeEspera = 1.5f;
     public float velocidadGiro = 3f;
@@ -26,6 +29,7 @@ public class MovimientoRutaPatrullero : MonoBehaviour
     public float tiempoInvestigacion = 2.5f;
 
     private Transform destinoActual;
+    private int indicePuntoActual = 0; // Para saber en qué punto de la lista estamos
     private bool estaCambiandoDePunto = false;
     private Rigidbody rb;
 
@@ -50,11 +54,13 @@ public class MovimientoRutaPatrullero : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-
-        // MUY IMPORTANTE: Evita que el enemigo se caiga de cara si le lanzas una caja fuerte
         rb.freezeRotation = true;
 
-        destinoActual = puntoB;
+        // Asignamos el primer punto de la ruta si existe alguno
+        if (puntosDePatrulla.Length > 0)
+        {
+            destinoActual = puntosDePatrulla[0];
+        }
 
         if (ojos == null)
             ojos = GetComponent<OjosPatrullero>();
@@ -97,7 +103,12 @@ public class MovimientoRutaPatrullero : MonoBehaviour
             else
             {
                 if (estadoActual == Estado.Persiguiendo)
+                {
+                    // Al perderte de vista, vuelve a buscar el punto actual de su ruta
                     estadoActual = Estado.Patrullando;
+                    if (puntosDePatrulla.Length > 0)
+                        destinoActual = puntosDePatrulla[indicePuntoActual];
+                }
 
                 timerDeteccion = 0f;
 
@@ -114,7 +125,6 @@ public class MovimientoRutaPatrullero : MonoBehaviour
                 break;
 
             case Estado.Investigando:
-                // Se maneja en la Coroutine
                 break;
 
             case Estado.Persiguiendo:
@@ -127,7 +137,7 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         }
     }
 
-    // -------------------------------------------------- NUEVO SISTEMA DE MOVIMIENTO
+    // -------------------------------------------------- SISTEMA DE MOVIMIENTO
 
     private void AplicarVelocidadHacia(Vector3 destino, float velocidad)
     {
@@ -135,9 +145,6 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         Vector3 destinoPlano = new Vector3(destino.x, 0, destino.z);
 
         Vector3 direccion = (destinoPlano - posPlana).normalized;
-
-        // Mantenemos la velocidad Y intacta para que la gravedad funcione perfectamente
-        // Nota: Si usas Unity 6, puedes cambiar 'velocity' por 'linearVelocity'
         rb.linearVelocity = new Vector3(direccion.x * velocidad, rb.linearVelocity.y, direccion.z * velocidad);
     }
 
@@ -150,7 +157,7 @@ public class MovimientoRutaPatrullero : MonoBehaviour
 
     void MoverHaciaDestino()
     {
-        if (destinoActual == null) return;
+        if (destinoActual == null || puntosDePatrulla.Length == 0) return;
 
         Vector3 posPlana = new Vector3(rb.position.x, 0, rb.position.z);
         Vector3 destinoPlano = new Vector3(destinoActual.position.x, 0, destinoActual.position.z);
@@ -174,9 +181,30 @@ public class MovimientoRutaPatrullero : MonoBehaviour
 
         yield return new WaitForSeconds(tiempoDeEspera);
 
-        destinoActual = (destinoActual == puntoA) ? puntoB : puntoA;
-        Vector3 nuevoDestinoPlano = new Vector3(destinoActual.position.x, 0, destinoActual.position.z);
+        // --- MAGIA DEL CAMBIO DE RUTA ---
+        if (puntosDePatrulla.Length > 1)
+        {
+            if (patrullaAleatoria)
+            {
+                // Elige un número al azar distinto al actual
+                int nuevoIndice = indicePuntoActual;
+                while (nuevoIndice == indicePuntoActual)
+                {
+                    nuevoIndice = Random.Range(0, puntosDePatrulla.Length);
+                }
+                indicePuntoActual = nuevoIndice;
+            }
+            else
+            {
+                // Va en orden: 0, 1, 2... y cuando llega al final, vuelve al 0
+                indicePuntoActual = (indicePuntoActual + 1) % puntosDePatrulla.Length;
+            }
+        }
 
+        destinoActual = puntosDePatrulla[indicePuntoActual];
+        // --------------------------------
+
+        Vector3 nuevoDestinoPlano = new Vector3(destinoActual.position.x, 0, destinoActual.position.z);
         float anguloDiferencia = 180f;
 
         while (anguloDiferencia > 1f)
@@ -184,10 +212,16 @@ public class MovimientoRutaPatrullero : MonoBehaviour
             Vector3 direccion = nuevoDestinoPlano - transform.position;
             direccion.y = 0f;
 
-            Quaternion rotacionDeseada = Quaternion.LookRotation(direccion);
-            transform.rotation = Quaternion.Slerp(transform.rotation, rotacionDeseada, velocidadGiro * Time.deltaTime);
-
-            anguloDiferencia = Quaternion.Angle(transform.rotation, rotacionDeseada);
+            if (direccion.sqrMagnitude > 0.01f)
+            {
+                Quaternion rotacionDeseada = Quaternion.LookRotation(direccion);
+                transform.rotation = Quaternion.Slerp(transform.rotation, rotacionDeseada, velocidadGiro * Time.deltaTime);
+                anguloDiferencia = Quaternion.Angle(transform.rotation, rotacionDeseada);
+            }
+            else
+            {
+                break;
+            }
             yield return null;
         }
 
@@ -208,6 +242,11 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         {
             enBusqueda = false;
             estadoActual = Estado.Patrullando;
+
+            // Cuando termina de buscar el ruido, se dirige al punto que le tocaba
+            if (puntosDePatrulla.Length > 0)
+                destinoActual = puntosDePatrulla[indicePuntoActual];
+
             Debug.Log(gameObject.name + " llegó al último punto de detección.");
         }
     }
@@ -241,15 +280,13 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         estadoActual = Estado.Investigando;
         Vector3 puntoPlano = new Vector3(punto.x, 0, punto.z);
 
-        // Caminar
         while (Vector3.Distance(new Vector3(rb.position.x, 0, rb.position.z), puntoPlano) > 0.3f)
         {
             AplicarVelocidadHacia(punto, velocidadPatrulla);
             GirarHacia(punto);
-            yield return null; // Esperamos al siguiente frame
+            yield return null;
         }
 
-        // Al llegar, se detiene y espera
         DetenerMovimientoHorizontal();
         Debug.Log($"[{gameObject.name}] Llegó al origen. Investigando...");
         yield return new WaitForSeconds(tiempoInvestigacion);
@@ -257,6 +294,10 @@ public class MovimientoRutaPatrullero : MonoBehaviour
         Debug.Log($"[{gameObject.name}] Falsa alarma. Volviendo a patrullar.");
         rutinaInvestigacionActual = null;
         estadoActual = Estado.Patrullando;
+
+        // Vuelve a su ruta
+        if (puntosDePatrulla.Length > 0)
+            destinoActual = puntosDePatrulla[indicePuntoActual];
     }
 
     void RecibirAlerta(Vector3 punto)
