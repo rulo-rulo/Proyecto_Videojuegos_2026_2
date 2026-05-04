@@ -36,13 +36,19 @@ namespace Telekinesis
 
         private bool  tocandoSuperficie = false;
         private float timerArrastre     = 0f;
+        private DirectionArrow arrow;
 
         public WeightClass WeightClass => weightClass;
 
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
+            arrow = gameObject.AddComponent<DirectionArrow>();
         }
+
+        public void ShowArrow(Vector3 direction) => arrow.Show(direction);
+        public void UpdateArrow(Vector3 direction) => arrow.UpdateDirection(direction);
+        public void HideArrow() => arrow.Hide();
 
         public void ApplyForce(Vector3 direction, float force)
         {
