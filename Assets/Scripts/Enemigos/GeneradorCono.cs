@@ -49,7 +49,9 @@ public class GeneradorCono : MonoBehaviour
 
             // Raycast para que el cono choque con paredes (opcional pero queda pro)
             Vector3 dirGlobal = transform.TransformDirection(puntoBase.normalized);
-            if (Physics.Raycast(transform.position, dirGlobal, out RaycastHit hit, distanciaVision, capaObstaculos))
+            int mask = ~LayerMask.GetMask("Llave");
+
+            if (Physics.Raycast(transform.position, dirGlobal, out RaycastHit hit, distanciaVision, mask, QueryTriggerInteraction.Ignore))
             {
                 vertices.Add(transform.InverseTransformPoint(hit.point));
             }

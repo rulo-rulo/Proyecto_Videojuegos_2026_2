@@ -5,21 +5,21 @@ namespace Telekinesis
 {
     public class TelekinesisManager : MonoBehaviour
     {
-        [SerializeField] private TelekinesisConfig            config;
-        [SerializeField] private Transform                    playerTransform;
-        [SerializeField] private Camara                       camara;
+        [SerializeField] private TelekinesisConfig config;
+        [SerializeField] private Transform playerTransform;
+        [SerializeField] private Camara camara;
         [SerializeField] private TelekinesisOutlineController outlineController;
         [SerializeField] private PlayerMovimiento playerMovimiento;
 
         [Header("Sistema de Cooldown UI")]
         [SerializeField] private HabilidadCooldown uiCooldown;
 
-        private TelekinesisInputHandler    inputHandler;
-        private TelekinesisState           currentState = TelekinesisState.Idle;
-        private MovableObject              currentTarget;
-        private List<MovableObject>        nearbyObjects  = new List<MovableObject>();
-        private float                      scanRefreshTimer;
-        private Transform                  originalCameraTarget;
+        private TelekinesisInputHandler inputHandler;
+        private TelekinesisState currentState = TelekinesisState.Idle;
+        private MovableObject currentTarget;
+        private List<MovableObject> nearbyObjects = new List<MovableObject>();
+        private float scanRefreshTimer;
+        private Transform originalCameraTarget;
 
         // -------------------------------------------------- Unity
 
@@ -38,6 +38,14 @@ namespace Telekinesis
 
         private void Update()
         {
+            // 🔹 ACTUALIZAR FLECHA EN TIEMPO REAL (del Script 2)
+            if (currentState == TelekinesisState.Aiming && currentTarget != null)
+            {
+                Vector3 direction = GetWorldDirection(inputHandler.LastDirection);
+                currentTarget.UpdateArrow(direction);
+            }
+
+            // 🔹 ESCANEO (de ambos scripts)
             if (currentState != TelekinesisState.Scanning) return;
 
             scanRefreshTimer += Time.deltaTime;
@@ -77,16 +85,16 @@ namespace Telekinesis
 
         private void HandleActionInput()
         {
-
-            
+            // 🔹 BLOQUEO POR COOLDOWN
             if (uiCooldown != null && uiCooldown.EstaEnEnfriamiento)
             {
-                Debug.Log("[Telekinesis] La habilidad se está recargando.");
+                Debug.Log("[Telekinesis] En cooldown.");
                 return;
             }
 
-
+            // 🔹 BLOQUEO POR OTRA HABILIDAD
             if (!AbilityManager.Instance.CanUseAbility(this)) return;
+
             switch (currentState)
             {
                 case TelekinesisState.Idle:
@@ -108,14 +116,16 @@ namespace Telekinesis
         private void EnterScanning()
         {
             AbilityManager.Instance.RegisterAbility(this);
+
             nearbyObjects = FindAllNearby();
             currentTarget = FindNearestFrom(nearbyObjects);
-            currentState  = TelekinesisState.Scanning;
+            currentState = TelekinesisState.Scanning;
 
             if (nearbyObjects.Count > 0)
                 outlineController.ShowOutlines(nearbyObjects, currentTarget);
 
-            if (uiCooldown != null) uiCooldown.EstablecerUsoActivo(true);
+            if (uiCooldown != null)
+                uiCooldown.EstablecerUsoActivo(true);
 
             Debug.Log("[Telekinesis] Escaneando.");
         }
@@ -132,6 +142,10 @@ namespace Telekinesis
             originalCameraTarget = playerTransform;
             camara.SetTarget(currentTarget.transform);
 
+            // 🔹 Mostrar flecha (Script 2)
+            Vector3 initialDirection = GetWorldDirection(inputHandler.LastDirection);
+            currentTarget.ShowArrow(initialDirection);
+
             Debug.Log($"[Telekinesis] Apuntando a: {currentTarget.gameObject.name}");
         }
 
@@ -140,23 +154,30 @@ namespace Telekinesis
             if (currentTarget == null) return;
 
             Vector3 direction = GetWorldDirection(inputHandler.LastDirection);
+
+            // 🔹 ocultar flecha
+            currentTarget.HideArrow();
+
             currentTarget.ApplyForce(direction, config.pushForce);
 
+            // 🔹 activar cooldown
             if (uiCooldown != null)
-            {
                 uiCooldown.IniciarCooldown();
-            }
 
             Cancel();
         }
 
         private void Cancel()
         {
-            if (uiCooldown != null) uiCooldown.EstablecerUsoActivo(false);
+            if (uiCooldown != null)
+                uiCooldown.EstablecerUsoActivo(false);
 
             AbilityManager.Instance.ClearAbility(this);
-            
+
             if (currentState == TelekinesisState.Idle) return;
+
+            if (currentTarget != null)
+                currentTarget.HideArrow();
 
             outlineController.HideOutlines();
             camara.SetTarget(originalCameraTarget);
@@ -164,31 +185,35 @@ namespace Telekinesis
             playerMovimiento.enabled = true;
 
             currentTarget = null;
-            currentState  = TelekinesisState.Idle;
+            currentState = TelekinesisState.Idle;
 
-            Debug.Log("[Telekinesis] Habilidad cancelada.");
+            Debug.Log("[Telekinesis] Cancelada.");
         }
 
-        // -------------------------------------------------- Dirección
+        // -------------------------------------------------- Dirección (versión mejorada combinada)
 
-        private Vector3 GetWorldDirection(Vector3 localDir)
+        private Vector3 GetWorldDirection(Vector3 inputDir)
         {
             Transform cam = Camera.main.transform;
-
-            // Obtenemos los vectores hacia adelante y a la derecha de la cámara, ignorando la altura (Y)
-            Vector3 camForward = Vector3.ProjectOnPlane(cam.forward, Vector3.up).normalized;
-            Vector3 camRight = Vector3.ProjectOnPlane(cam.right, Vector3.up).normalized;
-
-            // Multiplicamos la inclinación del joystick por la rotación de la cámara
-            Vector3 finalDirection = (camForward * localDir.z + camRight * localDir.x).normalized;
-
-            // Por seguridad: si la dirección final es 0 (algo raro pasó), lo empujamos hacia arriba
-            if (finalDirection.sqrMagnitude < 0.01f)
-            {
-                return cam.up;
-            }
-
-            return finalDirection;
+        
+            // Direcciones de la cámara en plano horizontal
+            Vector3 camForward = cam.forward;
+            Vector3 camRight = cam.right;
+        
+            camForward.y = 0;
+            camRight.y = 0;
+        
+            camForward.Normalize();
+            camRight.Normalize();
+        
+            // Convertimos input a mundo RELATIVO A LA CÁMARA
+            Vector3 direction = camForward * inputDir.z + camRight * inputDir.x;
+        
+            // Si no hay input → hacia delante de la cámara
+            if (direction.sqrMagnitude < 0.01f)
+                direction = camForward;
+        
+            return direction.normalized;
         }
 
         // -------------------------------------------------- Detección
@@ -213,8 +238,8 @@ namespace Telekinesis
 
         private MovableObject FindNearestFrom(List<MovableObject> objects)
         {
-            MovableObject nearest  = null;
-            float         bestDist = float.MaxValue;
+            MovableObject nearest = null;
+            float bestDist = float.MaxValue;
 
             foreach (MovableObject obj in objects)
             {
@@ -222,7 +247,7 @@ namespace Telekinesis
                 if (dist < bestDist)
                 {
                     bestDist = dist;
-                    nearest  = obj;
+                    nearest = obj;
                 }
             }
 
