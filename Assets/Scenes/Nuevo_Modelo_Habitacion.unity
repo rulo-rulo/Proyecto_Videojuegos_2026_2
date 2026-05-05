@@ -9178,6 +9178,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 8ddff260eb44e67498c710b368dc9559, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: dc001c9a7fbdd3c4d83a11cb75e03cd1, type: 2}
     - target: {fileID: 919132149155446097, guid: 8ddff260eb44e67498c710b368dc9559, type: 3}
       propertyPath: m_Name
       value: tetera
@@ -19615,6 +19619,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 41255e8bb59f9f04589991db0c1cfbd1, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 0d8a92e2b50accc4288c1b31267ba8b9, type: 2}
     - target: {fileID: 919132149155446097, guid: 41255e8bb59f9f04589991db0c1cfbd1, type: 3}
       propertyPath: m_Name
       value: mesita_texturizado_habitacion_primera
