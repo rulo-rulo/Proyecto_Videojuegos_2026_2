@@ -1591,6 +1591,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 0a7301d949d5bd84b9721e466d4db3e0, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7c7455f7771e79e47a75a349d101fb21, type: 2}
     - target: {fileID: 919132149155446097, guid: 0a7301d949d5bd84b9721e466d4db3e0, type: 3}
       propertyPath: m_Name
       value: "sill\xF3n_2"
@@ -1921,6 +1925,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: e7bc94a06ae9e01448812b5e2a6bb1af, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 91bff7a3e73bf154793a9a2b70bc1a14, type: 2}
     - target: {fileID: 919132149155446097, guid: e7bc94a06ae9e01448812b5e2a6bb1af, type: 3}
       propertyPath: m_Name
       value: armario
@@ -3490,6 +3498,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 3f9c975aafd906942863fb11378587bf, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7c7455f7771e79e47a75a349d101fb21, type: 2}
     - target: {fileID: 919132149155446097, guid: 3f9c975aafd906942863fb11378587bf, type: 3}
       propertyPath: m_Name
       value: "sof\xE1"
@@ -4075,6 +4087,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 3f9c975aafd906942863fb11378587bf, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7c7455f7771e79e47a75a349d101fb21, type: 2}
     - target: {fileID: 919132149155446097, guid: 3f9c975aafd906942863fb11378587bf, type: 3}
       propertyPath: m_Name
       value: "sof\xE1"
@@ -7355,6 +7371,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -10
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 3f9c975aafd906942863fb11378587bf, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7c7455f7771e79e47a75a349d101fb21, type: 2}
     - target: {fileID: 919132149155446097, guid: 3f9c975aafd906942863fb11378587bf, type: 3}
       propertyPath: m_Name
       value: "sof\xE1HabitacionFondoDerecha"
@@ -11182,6 +11202,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: f6a2566e82f72014d8217f4ae68434c1, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 87ede8c45b4ac10408d71848a3390d20, type: 2}
     - target: {fileID: 919132149155446097, guid: f6a2566e82f72014d8217f4ae68434c1, type: 3}
       propertyPath: m_Name
       value: jarron_texturizado
@@ -15089,6 +15113,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 41255e8bb59f9f04589991db0c1cfbd1, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b68752fe6c564ab42806306873d3988c, type: 2}
     - target: {fileID: 919132149155446097, guid: 41255e8bb59f9f04589991db0c1cfbd1, type: 3}
       propertyPath: m_Name
       value: mesita_texturizado
@@ -15242,6 +15270,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: f6a2566e82f72014d8217f4ae68434c1, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 87ede8c45b4ac10408d71848a3390d20, type: 2}
     - target: {fileID: 919132149155446097, guid: f6a2566e82f72014d8217f4ae68434c1, type: 3}
       propertyPath: m_Name
       value: jarron_texturizado_salon
@@ -17822,6 +17854,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 41255e8bb59f9f04589991db0c1cfbd1, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b68752fe6c564ab42806306873d3988c, type: 2}
     - target: {fileID: 919132149155446097, guid: 41255e8bb59f9f04589991db0c1cfbd1, type: 3}
       propertyPath: m_Name
       value: mesita_texturizado_habitacion_primera
@@ -18757,6 +18793,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 0a7301d949d5bd84b9721e466d4db3e0, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7c7455f7771e79e47a75a349d101fb21, type: 2}
     - target: {fileID: 919132149155446097, guid: 0a7301d949d5bd84b9721e466d4db3e0, type: 3}
       propertyPath: m_Name
       value: "sill\xF3n"
@@ -20322,6 +20362,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: e7bc94a06ae9e01448812b5e2a6bb1af, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 91bff7a3e73bf154793a9a2b70bc1a14, type: 2}
     - target: {fileID: 919132149155446097, guid: e7bc94a06ae9e01448812b5e2a6bb1af, type: 3}
       propertyPath: m_Name
       value: armario
