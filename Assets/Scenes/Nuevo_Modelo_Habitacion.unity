@@ -20192,7 +20192,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2005204582
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21122,7 +21122,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c27e16656e194c4a8203b7d821b938f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileSize: 1
 --- !u!33 &2086167134
 MeshFilter:
   m_ObjectHideFlags: 0
