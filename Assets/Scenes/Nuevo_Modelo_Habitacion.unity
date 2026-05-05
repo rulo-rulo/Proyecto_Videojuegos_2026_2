@@ -311,6 +311,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: f6a2566e82f72014d8217f4ae68434c1, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 87ede8c45b4ac10408d71848a3390d20, type: 2}
     - target: {fileID: 919132149155446097, guid: f6a2566e82f72014d8217f4ae68434c1, type: 3}
       propertyPath: m_Name
       value: jarron_texturizado
@@ -7870,6 +7874,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 63aea1953971ac243b522a251cc16e13, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: b68752fe6c564ab42806306873d3988c, type: 2}
     - target: {fileID: 919132149155446097, guid: 63aea1953971ac243b522a251cc16e13, type: 3}
       propertyPath: m_Name
       value: mesaSalon
@@ -13315,6 +13323,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 3f9c975aafd906942863fb11378587bf, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 7c7455f7771e79e47a75a349d101fb21, type: 2}
     - target: {fileID: 919132149155446097, guid: 3f9c975aafd906942863fb11378587bf, type: 3}
       propertyPath: m_Name
       value: "sof\xE1"
