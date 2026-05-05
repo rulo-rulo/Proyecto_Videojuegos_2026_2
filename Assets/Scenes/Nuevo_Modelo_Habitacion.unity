@@ -1577,7 +1577,7 @@ GameObject:
   - component: {fileID: 129339166}
   - component: {fileID: 129339165}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (6)
+  m_Name: Pared (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1872,7 +1872,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1596b38fd0c45c341b091d398b05c090, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -17.77
+      value: -22.81
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1596b38fd0c45c341b091d398b05c090, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1880,7 +1880,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1596b38fd0c45c341b091d398b05c090, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -49.82
+      value: -49.1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 1596b38fd0c45c341b091d398b05c090, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2079,7 +2079,7 @@ GameObject:
   - component: {fileID: 187656634}
   - component: {fileID: 187656633}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (1)
+  m_Name: Pared (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3321,7 +3321,7 @@ GameObject:
   - component: {fileID: 310889304}
   - component: {fileID: 310889303}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (2)
+  m_Name: Pared
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4403,7 +4403,7 @@ GameObject:
   - component: {fileID: 471273482}
   - component: {fileID: 471273481}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (5)
+  m_Name: Pared (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4681,7 +4681,7 @@ GameObject:
   - component: {fileID: 501372918}
   - component: {fileID: 501372917}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (4)
+  m_Name: Pared (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5205,7 +5205,7 @@ GameObject:
   - component: {fileID: 551530598}
   - component: {fileID: 551530597}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (5)
+  m_Name: Pared (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5350,7 +5350,7 @@ GameObject:
   - component: {fileID: 558894827}
   - component: {fileID: 558894826}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (9)
+  m_Name: Pared (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6353,7 +6353,7 @@ GameObject:
   - component: {fileID: 680714463}
   - component: {fileID: 680714462}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (4)
+  m_Name: Pared
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6984,7 +6984,7 @@ GameObject:
   - component: {fileID: 732482313}
   - component: {fileID: 732482312}
   m_Layer: 0
-  m_Name: ParedFinal
+  m_Name: Pared (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7352,7 +7352,7 @@ GameObject:
   - component: {fileID: 744221883}
   - component: {fileID: 744221882}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (9)
+  m_Name: Pared (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8507,7 +8507,7 @@ GameObject:
   - component: {fileID: 900235962}
   - component: {fileID: 900235961}
   m_Layer: 0
-  m_Name: TrozoIzquierdo
+  m_Name: Pared
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9266,7 +9266,7 @@ GameObject:
   - component: {fileID: 962680376}
   - component: {fileID: 962680375}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (3)
+  m_Name: Pared (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9732,7 +9732,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -12.559999, y: 0.57}
+  m_AnchoredPosition: {x: -11.64, y: 0.57}
   m_SizeDelta: {x: 20, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1009316822
@@ -10351,7 +10351,7 @@ GameObject:
   - component: {fileID: 1042334101}
   - component: {fileID: 1042334100}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (4)
+  m_Name: Pared
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10653,7 +10653,7 @@ GameObject:
   - component: {fileID: 1079289349}
   - component: {fileID: 1079289348}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (4)
+  m_Name: Pared (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10872,7 +10872,7 @@ GameObject:
   - component: {fileID: 1083002429}
   - component: {fileID: 1083002428}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (8)
+  m_Name: Pared (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11519,7 +11519,7 @@ GameObject:
   - component: {fileID: 1141241730}
   - component: {fileID: 1141241729}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (1)
+  m_Name: Pared (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11627,7 +11627,7 @@ GameObject:
   - component: {fileID: 1146210425}
   - component: {fileID: 1146210424}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (8)
+  m_Name: Pared
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12027,7 +12027,7 @@ GameObject:
   - component: {fileID: 1176707812}
   - component: {fileID: 1176707811}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (5)
+  m_Name: Pared
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13596,7 +13596,7 @@ GameObject:
   - component: {fileID: 1313688914}
   - component: {fileID: 1313688913}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (4)
+  m_Name: Pared
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15448,7 +15448,7 @@ GameObject:
   - component: {fileID: 1514895978}
   - component: {fileID: 1514895977}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (6)
+  m_Name: Pared (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15899,7 +15899,7 @@ GameObject:
   - component: {fileID: 1554680791}
   - component: {fileID: 1554680790}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (8)
+  m_Name: Pared
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16360,7 +16360,7 @@ GameObject:
   - component: {fileID: 1598435462}
   - component: {fileID: 1598435461}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (2)
+  m_Name: Pared
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17480,7 +17480,7 @@ GameObject:
   - component: {fileID: 1687892859}
   - component: {fileID: 1687892858}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (5)
+  m_Name: Pared (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17619,7 +17619,7 @@ GameObject:
   - component: {fileID: 1690234245}
   - component: {fileID: 1690234244}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (9)
+  m_Name: Pared (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17727,7 +17727,7 @@ GameObject:
   - component: {fileID: 1694732924}
   - component: {fileID: 1694732923}
   m_Layer: 0
-  m_Name: TrozoIzquierdo
+  m_Name: Pared
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19000,7 +19000,7 @@ GameObject:
   - component: {fileID: 1795642979}
   - component: {fileID: 1795642978}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (5)
+  m_Name: Pared
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21195,7 +21195,7 @@ GameObject:
   - component: {fileID: 1941409990}
   - component: {fileID: 1941409989}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (3)
+  m_Name: Pared (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21687,7 +21687,7 @@ GameObject:
   - component: {fileID: 2002387695}
   - component: {fileID: 2002387694}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (6)
+  m_Name: Pared (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23049,7 +23049,7 @@ GameObject:
   - component: {fileID: 2101218056}
   - component: {fileID: 2101218055}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (2)
+  m_Name: Pared
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23224,7 +23224,7 @@ GameObject:
   - component: {fileID: 2133250810}
   - component: {fileID: 2133250809}
   m_Layer: 0
-  m_Name: TrozoIzquierdo (7)
+  m_Name: Pared (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
