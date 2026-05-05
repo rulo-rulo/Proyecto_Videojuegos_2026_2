@@ -3376,6 +3376,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 88d9b0bb6b097314bb433d5d60f2d5b7, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 87ede8c45b4ac10408d71848a3390d20, type: 2}
     - target: {fileID: 919132149155446097, guid: 88d9b0bb6b097314bb433d5d60f2d5b7, type: 3}
       propertyPath: m_Name
       value: Candelabro_cocina
@@ -10623,6 +10627,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 88d9b0bb6b097314bb433d5d60f2d5b7, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 87ede8c45b4ac10408d71848a3390d20, type: 2}
     - target: {fileID: 919132149155446097, guid: 88d9b0bb6b097314bb433d5d60f2d5b7, type: 3}
       propertyPath: m_Name
       value: Candelabro
