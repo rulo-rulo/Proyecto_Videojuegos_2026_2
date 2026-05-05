@@ -7,94 +7,85 @@ public class PlayerMovimiento : MonoBehaviour
     private CharacterController controlador;
 
     [Header("Movimiento")]
-    [Tooltip("Velocidad base del jugador. Ahora es igual a la antigua velocidad de correr.")]
     [SerializeField] private float velocidadMovimiento = 8f;
-
-    // NUEVO: Variable para controlar lo rápido que gira el personaje
-    [Tooltip("Velocidad a la que el personaje gira hacia la dirección de movimiento.")]
     [SerializeField] private float velocidadRotacion = 10f;
 
     [Header("Gravedad")]
     [SerializeField] private float Gravedad = -9f;
     private Vector3 velocidadVertical;
 
-    void Start()
-    {
-
-    }
-
     private void Awake()
     {
+
+        Application.targetFrameRate = 60; // Fuerza al juego a intentar ir siempre a 60fps
         controlador = GetComponent<CharacterController>();
 
         if (camara == null && Camera.main != null)
         {
             camara = Camera.main.transform;
         }
+
     }
 
-    void Update()
+    void FixedUpdate() // Cambiado de Update a FixedUpdate
     {
-        if (!enabled) return;
-        MoverJugadorEnPlano();
-        AplicarGravedad();
-    }
+        if (!enabled || !controlador.enabled) return;
 
-    private void MoverJugadorEnPlano()
-    {
-        if (!controlador.enabled) return;
+        // 1. Dirección
+        Vector3 direccionHorizontal = CalcularDireccionInput();
 
-        float Horizontal = 0f;
-        float Vertical = 0f;
-
-        if (Input.GetKey(KeyCode.RightArrow)) Horizontal += 1f;
-        if (Input.GetKey(KeyCode.LeftArrow)) Horizontal -= 1f;
-        if (Input.GetKey(KeyCode.UpArrow)) Vertical += 1f;
-        if (Input.GetKey(KeyCode.DownArrow)) Vertical -= 1f;
-
-        Horizontal += Input.GetAxisRaw("MandoHorizontal");
-        Vertical += Input.GetAxisRaw("MandoVertical");
-
-        Horizontal = Mathf.Clamp(Horizontal, -1f, 1f);
-        Vertical = Mathf.Clamp(Vertical, -1f, 1f);
-
-        Vector3 adelanteCamara = camara.forward;
-        Vector3 derechaCamara = camara.right;
-
-        adelanteCamara.y = 0f;
-        derechaCamara.y = 0f;
-
-        adelanteCamara.Normalize();
-        derechaCamara.Normalize();
-
-        Vector3 direccionPlano = (derechaCamara * Horizontal + adelanteCamara * Vertical);
-
-        // Si hay algún input de movimiento (sqrMagnitude mayor que casi cero)
-        if (direccionPlano.sqrMagnitude > 0.0001f)
+        // 2. Rotación (Usamos fixedDeltaTime)
+        if (direccionHorizontal.sqrMagnitude > 0.001f)
         {
-            // Normalizamos el vector para que no se mueva mas rapido en diagonal.
-            direccionPlano.Normalize();
-
-            // NUEVO: Calculamos la rotación deseada mirando hacia la dirección del movimiento
-            Quaternion rotacionDeseada = Quaternion.LookRotation(direccionPlano);
-
-            // NUEVO: Giramos suavemente el personaje hacia esa rotación
-            transform.rotation = Quaternion.Slerp(transform.rotation, rotacionDeseada, velocidadRotacion * Time.deltaTime);
+            Quaternion rotacionDeseada = Quaternion.LookRotation(direccionHorizontal);
+            transform.rotation = Quaternion.Slerp(transform.rotation, rotacionDeseada, velocidadRotacion * Time.fixedDeltaTime);
         }
 
-        Vector3 desplazamientoXZ = direccionPlano * (velocidadMovimiento * Time.deltaTime);
-        controlador.Move(desplazamientoXZ);
+        // 3. Gravedad
+        ActualizarGravedadFixed();
+
+        // 4. Mover (UNA VEZ, con fixedDeltaTime)
+        Vector3 movimientoFinal = (direccionHorizontal * velocidadMovimiento) + velocidadVertical;
+        controlador.Move(movimientoFinal * Time.fixedDeltaTime);
     }
 
-    private void AplicarGravedad()
+    // Crea esta versión pequeña para el FixedUpdate
+    private void ActualizarGravedadFixed()
     {
-        if (!controlador.enabled) return;
-        velocidadVertical.y += Gravedad * Time.deltaTime;
-        controlador.Move(velocidadVertical * Time.deltaTime);
-
         if (controlador.isGrounded && velocidadVertical.y < 0)
         {
             velocidadVertical.y = -2f;
         }
+        else
+        {
+            velocidadVertical.y += Gravedad * Time.fixedDeltaTime;
+        }
+    }
+
+    private Vector3 CalcularDireccionInput()
+    {
+        float h = 0f;
+        float v = 0f;
+
+        // Soporte para flechas y mando
+        if (Input.GetKey(KeyCode.RightArrow)) h += 1f;
+        if (Input.GetKey(KeyCode.LeftArrow)) h -= 1f;
+        if (Input.GetKey(KeyCode.UpArrow)) v += 1f;
+        if (Input.GetKey(KeyCode.DownArrow)) v -= 1f;
+
+        h += Input.GetAxisRaw("MandoHorizontal");
+        v += Input.GetAxisRaw("MandoVertical");
+
+        h = Mathf.Clamp(h, -1f, 1f);
+        v = Mathf.Clamp(v, -1f, 1f);
+
+        Vector3 forward = camara.forward;
+        Vector3 right = camara.right;
+        forward.y = 0f;
+        right.y = 0f;
+        forward.Normalize();
+        right.Normalize();
+
+        return (right * h + forward * v).normalized;
     }
 }

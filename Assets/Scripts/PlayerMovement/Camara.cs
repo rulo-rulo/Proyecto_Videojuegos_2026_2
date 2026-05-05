@@ -19,7 +19,7 @@ public class Camara : MonoBehaviour
         if (currentTarget == null) return;
 
         Vector3 posicionObjetivo = currentTarget.position + offset;
-        transform.position = Vector3.Lerp(transform.position, posicionObjetivo, Suavizado * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, posicionObjetivo, Suavizado * Time.smoothDeltaTime);
     }
 
     public void SetTarget(Transform newTarget)
